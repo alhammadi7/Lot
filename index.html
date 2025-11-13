@@ -164,7 +164,6 @@
       opacity: 0.7;
     }
 
-    /* شعار شموع داخل اللوقو */
     .logo-chart {
       display: flex;
       align-items: flex-end;
@@ -273,9 +272,7 @@
       box-shadow: 0 0 7px rgba(40, 52, 90, 0.8);
     }
 
-    .lang-toggle span.icon {
-      font-size: 13px;
-    }
+    .lang-toggle span.icon { font-size: 13px; }
 
     .badge-row {
       display: flex;
@@ -560,6 +557,39 @@
       text-align: center;
       padding: 5px 0;
       color: var(--text-muted);
+    }
+
+    /* خانة اتجاه الصفقة (Buy / Sell) */
+    .direction-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .direction-buy {
+      background: rgba(76, 175, 80, 0.12);
+      color: #8be58f;
+      border: 1px solid rgba(76, 175, 80, 0.7);
+    }
+
+    .direction-sell {
+      background: rgba(244, 67, 54, 0.12);
+      color: #ff8b8b;
+      border: 1px solid rgba(244, 67, 54, 0.7);
+    }
+
+    body.light .direction-buy {
+      background: rgba(76, 175, 80, 0.08);
+      color: #2e7d32;
+    }
+
+    body.light .direction-sell {
+      background: rgba(244, 67, 54, 0.08);
+      color: #c62828;
     }
 
     @media (max-width: 480px) {
@@ -929,7 +959,27 @@
 
       let rr1 = null;
       let rr2 = null;
-      let direction = entryPrice < slPrice ? (currentLang === "ar" ? "بيع" : "Sell") : (currentLang === "ar" ? "شراء" : "Buy");
+
+      // تحديد الاتجاه
+      let direction = entryPrice < slPrice
+        ? (currentLang === "ar" ? "بيع" : "Sell")
+        : (currentLang === "ar" ? "شراء" : "Buy");
+
+      // خانة الاتجاه مع سهم
+      let dirHtml;
+      if (currentLang === "ar") {
+        if (direction === "شراء") {
+          dirHtml = "<span class='direction-tag direction-buy'>⬆ " + direction + "</span>";
+        } else {
+          dirHtml = "<span class='direction-tag direction-sell'>⬇ " + direction + "</span>";
+        }
+      } else {
+        if (direction === "Buy") {
+          dirHtml = "<span class='direction-tag direction-buy'>⬆ " + direction + "</span>";
+        } else {
+          dirHtml = "<span class='direction-tag direction-sell'>⬇ " + direction + "</span>";
+        }
+      }
 
       if (!isNaN(tp1)) {
         const profitPips1 = Math.abs(tp1 - entryPrice) / pipSize;
@@ -1007,6 +1057,7 @@
 
       if (currentLang === "ar") {
         resultBox.innerHTML =
+          dirHtml + "<br>" +
           "حجم اللوت المقترح: <b>" +
           formatNumber(lotSize, 3) +
           " لوت</b> (" +
@@ -1028,6 +1079,7 @@
           fundingText;
       } else {
         resultBox.innerHTML =
+          dirHtml + "<br>" +
           "Suggested lot size: <b>" +
           formatNumber(lotSize, 3) +
           " lots</b> (" +
@@ -1285,7 +1337,6 @@
       document.getElementById("th_rr1").textContent = "R:R1";
       document.getElementById("th_account").textContent = isAr ? "حساب" : "Account";
 
-      // placeholders
       document.getElementById("balance").placeholder = isAr ? "مثال: 10000" : "Ex: 10000";
       document.getElementById("riskPercent").placeholder = isAr ? "مثال: 1" : "Ex: 1";
       document.getElementById("entryPrice").placeholder = isAr
@@ -1299,7 +1350,6 @@
       document.getElementById("dailyLossPct").placeholder = isAr ? "مثال شائع: 5" : "Common: 5";
       document.getElementById("totalLossPct").placeholder = isAr ? "مثال شائع: 10" : "Common: 10";
 
-      // select options text
       const inst = document.getElementById("instrumentType").options;
       if (isAr) {
         inst[0].text = "فوركس 4 منازل (EURUSD, GBPUSD, ...)";
