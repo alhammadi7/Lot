@@ -723,6 +723,21 @@
 
       <div class="row-2">
         <div>
+          <label id="lbl_tp3">هدف 3 (TP3):</label>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="tp3"
+              step="0.00001"
+              placeholder="اختياري"
+            />
+          </div>
+        </div>
+        <div></div>
+      </div>
+
+      <div class="row-2">
+        <div>
           <label id="lbl_lev">الرافعة المالية (Leverage):</label>
           <div class="input-wrapper">
             <input type="number" id="leverage" placeholder="مثال: 100 أو 500" />
@@ -744,6 +759,56 @@
         </div>
       </div>
 
+      <!-- قسم جديد: توليد SL/TP من النسبة -->
+      <div id="secLevels" class="section-title">مستويات الوقف والأهداف من النسبة</div>
+
+      <div class="row-2">
+        <div>
+          <label id="lbl_sideLevels">نوع الصفقة لهذا الحساب:</label>
+          <div class="input-wrapper">
+            <select id="sideLevels">
+              <option value="buy">شراء (Long)</option>
+              <option value="sell">بيع (Short)</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+        <div>
+          <label id="lbl_lotLevels">حجم اللوت المستخدم (اختياري):</label>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="lotLevels"
+              step="0.01"
+              placeholder="مثال: 1 أو 0.1"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div>
+          <label id="lbl_rrs">نِسَب الأهداف R:R (1,2,3):</label>
+          <div class="input-wrapper">
+            <input type="number" id="rr1Mul" step="0.1" placeholder="1" />
+          </div>
+          <div class="input-wrapper">
+            <input type="number" id="rr2Mul" step="0.1" placeholder="2" />
+          </div>
+          <div class="input-wrapper">
+            <input type="number" id="rr3Mul" step="0.1" placeholder="3" />
+          </div>
+        </div>
+        <div></div>
+      </div>
+
+      <button id="btn_levelsCalc" class="secondary" type="button" onclick="calculateLevels()">
+        احسب مستويات الوقف والأهداف
+      </button>
+
+      <div class="result" id="levelsResultBox" style="display:none;"></div>
+
+      <!-- حسابات التمويل -->
       <div id="secFunding" class="section-title">حسابات التمويل (Prop)</div>
 
       <div class="row-2">
@@ -902,6 +967,7 @@
       const slPrice = parseFloat(document.getElementById("slPrice").value);
       const tp1 = parseFloat(document.getElementById("tp1").value);
       const tp2 = parseFloat(document.getElementById("tp2").value);
+      const tp3 = parseFloat(document.getElementById("tp3").value);
       const leverage = parseFloat(document.getElementById("leverage").value);
       const instrumentType =
         document.getElementById("instrumentType").value;
@@ -959,6 +1025,7 @@
 
       let rr1 = null;
       let rr2 = null;
+      let rr3 = null;
 
       // تحديد الاتجاه
       let direction = entryPrice < slPrice
@@ -988,6 +1055,10 @@
       if (!isNaN(tp2)) {
         const profitPips2 = Math.abs(tp2 - entryPrice) / pipSize;
         rr2 = profitPips2 / stopLossPips;
+      }
+      if (!isNaN(tp3)) {
+        const profitPips3 = Math.abs(tp3 - entryPrice) / pipSize;
+        rr3 = profitPips3 / stopLossPips;
       }
 
       let fundingText = "";
@@ -1035,7 +1106,7 @@
       }
 
       let rrText = "";
-      if (rr1 || rr2) {
+      if (rr1 || rr2 || rr3) {
         if (currentLang === "ar") {
           rrText += "<br><br><b>تحليل R:R للأهداف:</b><br>";
           if (rr1) {
@@ -1044,6 +1115,9 @@
           if (rr2) {
             rrText += "الهدف 2 (TP2): R:R ≈ " + formatNumber(rr2, 2) + "<br>";
           }
+          if (rr3) {
+            rrText += "الهدف 3 (TP3): R:R ≈ " + formatNumber(rr3, 2) + "<br>";
+          }
         } else {
           rrText += "<br><br><b>R:R analysis for targets:</b><br>";
           if (rr1) {
@@ -1051,6 +1125,9 @@
           }
           if (rr2) {
             rrText += "Target 2 (TP2): R:R ≈ " + formatNumber(rr2, 2) + "<br>";
+          }
+          if (rr3) {
+            rrText += "Target 3 (TP3): R:R ≈ " + formatNumber(rr3, 2) + "<br>";
           }
         }
       }
@@ -1116,6 +1193,126 @@
       };
 
       renderTrades();
+    }
+
+    // دالة جديدة: توليد SL/TP1/2/3 من النسبة
+    function calculateLevels() {
+      const balance = parseFloat(document.getElementById("balance").value);
+      const riskPercent = parseFloat(document.getElementById("riskPercent").value);
+      const entryPrice = parseFloat(document.getElementById("entryPrice").value);
+      const leverage = parseFloat(document.getElementById("leverage").value);
+      const instrumentType = document.getElementById("instrumentType").value;
+      const side = document.getElementById("sideLevels").value;
+      const lotLevels = parseFloat(document.getElementById("lotLevels").value);
+      let rr1Mul = parseFloat(document.getElementById("rr1Mul").value);
+      let rr2Mul = parseFloat(document.getElementById("rr2Mul").value);
+      let rr3Mul = parseFloat(document.getElementById("rr3Mul").value);
+
+      const box = document.getElementById("levelsResultBox");
+
+      if (isNaN(balance) || isNaN(riskPercent) || isNaN(entryPrice) || isNaN(leverage)) {
+        box.style.display = "block";
+        box.classList.add("error");
+        box.innerHTML =
+          currentLang === "ar"
+            ? "لتوليد مستويات SL/TP من النسبة، أدخل رصيد الحساب، نسبة المخاطرة، سعر الدخول، والرافعة على الأقل."
+            : "To generate SL/TP levels from %, please fill balance, risk %, entry price and leverage.";
+        return;
+      }
+
+      const params = getInstrumentParams(instrumentType);
+      const contractSize = params.contractSize;
+      const pipSize = params.pipSize;
+
+      // رقم المنازل لعكس pipSize
+      let priceDecimals = 2;
+      if (pipSize === 0.0001) priceDecimals = 5;
+      else if (pipSize === 0.01) priceDecimals = 3;
+      else if (pipSize === 0.1) priceDecimals = 2;
+
+      const riskAmount = balance * (riskPercent / 100);
+
+      // حجم اللوت المستخدم: إما مدخل من المستخدم أو أكبر لوت ممكن حسب الرافعة
+      let lotUsed;
+      if (!isNaN(lotLevels) && lotLevels > 0) {
+        lotUsed = lotLevels;
+      } else {
+        const maxNotional = balance * leverage;
+        const notionalPerLot = contractSize * entryPrice;
+        lotUsed = maxNotional / notionalPerLot;
+        if (!isFinite(lotUsed) || lotUsed <= 0) {
+          lotUsed = 1;
+        }
+      }
+
+      // نسب R:R الافتراضية
+      if (isNaN(rr1Mul) || rr1Mul <= 0) rr1Mul = 1;
+      if (isNaN(rr2Mul) || rr2Mul <= 0) rr2Mul = 2;
+      if (isNaN(rr3Mul) || rr3Mul <= 0) rr3Mul = 3;
+
+      const pipValuePerLot = contractSize * pipSize;
+      const pipValueActual = pipValuePerLot * lotUsed;
+      if (!isFinite(pipValueActual) || pipValueActual <= 0) {
+        box.style.display = "block";
+        box.classList.add("error");
+        box.innerHTML =
+          currentLang === "ar"
+            ? "تعذر حساب قيمة النقطة من المعطيات الحالية. تحقق من نوع الأداة وسعر الدخول."
+            : "Failed to compute pip value from current inputs. Check instrument type and entry price.";
+        return;
+      }
+
+      const riskPips = riskAmount / pipValueActual;
+      const priceDelta = riskPips * pipSize;
+
+      let sl, tp1, tp2, tp3;
+      if (side === "buy") {
+        sl = entryPrice - priceDelta;
+        tp1 = entryPrice + rr1Mul * priceDelta;
+        tp2 = entryPrice + rr2Mul * priceDelta;
+        tp3 = entryPrice + rr3Mul * priceDelta;
+      } else {
+        sl = entryPrice + priceDelta;
+        tp1 = entryPrice - rr1Mul * priceDelta;
+        tp2 = entryPrice - rr2Mul * priceDelta;
+        tp3 = entryPrice - rr3Mul * priceDelta;
+      }
+
+      // تعبئة الخانات الأساسية
+      document.getElementById("slPrice").value = sl.toFixed(priceDecimals);
+      document.getElementById("tp1").value = tp1.toFixed(priceDecimals);
+      document.getElementById("tp2").value = tp2.toFixed(priceDecimals);
+      document.getElementById("tp3").value = tp3.toFixed(priceDecimals);
+
+      box.style.display = "block";
+      box.classList.remove("error");
+
+      const dirTextAr = side === "buy" ? "شراء" : "بيع";
+      const dirTextEn = side === "buy" ? "Buy" : "Sell";
+
+      if (currentLang === "ar") {
+        box.innerHTML =
+          "<b>اتجاه الصفقة:</b> " + (side === "buy" ? "⬆ " + dirTextAr : "⬇ " + dirTextAr) + "<br>" +
+          "المبلغ المعرض للخسارة: <b>" + formatNumber(riskAmount, 2) + "</b> (" + riskPercent + "% من الحساب) باستخدام لوت ≈ " + formatNumber(lotUsed, 2) + "<br>" +
+          "المسافة إلى وقف الخسارة: <b>" + formatNumber(riskPips, 1) + "</b> نقطة تقريباً<br><br>" +
+          "<b>المستويات المقترحة:</b><br>" +
+          "وقف الخسارة (SL): <b>" + sl.toFixed(priceDecimals) + "</b><br>" +
+          "الهدف 1 (TP1) عند R:R = " + rr1Mul + ": <b>" + tp1.toFixed(priceDecimals) + "</b><br>" +
+          "الهدف 2 (TP2) عند R:R = " + rr2Mul + ": <b>" + tp2.toFixed(priceDecimals) + "</b><br>" +
+          "الهدف 3 (TP3) عند R:R = " + rr3Mul + ": <b>" + tp3.toFixed(priceDecimals) + "</b><br>" +
+          "<br>يمكنك الآن الضغط على زر <b>احسب حجم اللوت</b> لاشتقاق اللوت بناءً على نفس المستويات.";
+      } else {
+        box.innerHTML =
+          "<b>Trade side:</b> " + (side === "buy" ? "⬆ " + dirTextEn : "⬇ " + dirTextEn) + "<br>" +
+          "Risk amount: <b>" + formatNumber(riskAmount, 2) + "</b> (" + riskPercent + "% of balance) using lot ≈ " + formatNumber(lotUsed, 2) + "<br>" +
+          "SL distance: <b>" + formatNumber(riskPips, 1) + "</b> pips approx<br><br>" +
+          "<b>Suggested levels:</b><br>" +
+          "Stop loss (SL): <b>" + sl.toFixed(priceDecimals) + "</b><br>" +
+          "Target 1 (TP1) at R:R = " + rr1Mul + ": <b>" + tp1.toFixed(priceDecimals) + "</b><br>" +
+          "Target 2 (TP2) at R:R = " + rr2Mul + ": <b>" + tp2.toFixed(priceDecimals) + "</b><br>" +
+          "Target 3 (TP3) at R:R = " + rr3Mul + ": <b>" + tp3.toFixed(priceDecimals) + "</b><br>" +
+          "<br>You can now click <b>Calculate lot size</b> to derive lot based on these levels.";
+      }
     }
 
     function saveTrade() {
@@ -1245,6 +1442,10 @@
         ? "مدخلات الحساب"
         : "Account inputs";
 
+      document.getElementById("secLevels").textContent = isAr
+        ? "مستويات الوقف والأهداف من النسبة"
+        : "SL & TP levels from % risk";
+
       document.getElementById("secFunding").textContent = isAr
         ? "حسابات التمويل (Prop)"
         : "Funding accounts (Prop)";
@@ -1277,6 +1478,10 @@
         ? "هدف 2 (TP2):"
         : "Target 2 (TP2):";
 
+      document.getElementById("lbl_tp3").textContent = isAr
+        ? "هدف 3 (TP3):"
+        : "Target 3 (TP3):";
+
       document.getElementById("lbl_lev").textContent = isAr
         ? "الرافعة المالية (Leverage):"
         : "Leverage:";
@@ -1284,6 +1489,18 @@
       document.getElementById("lbl_instr").textContent = isAr
         ? "نوع الأداة:"
         : "Instrument type:";
+
+      document.getElementById("lbl_sideLevels").textContent = isAr
+        ? "نوع الصفقة لهذا الحساب:"
+        : "Trade side for this calc:";
+
+      document.getElementById("lbl_lotLevels").textContent = isAr
+        ? "حجم اللوت المستخدم (اختياري):"
+        : "Lot size used (optional):";
+
+      document.getElementById("lbl_rrs").textContent = isAr
+        ? "نِسَب الأهداف R:R (1,2,3):"
+        : "Targets R:R multiples (1,2,3):";
 
       document.getElementById("lbl_fundingPlan").textContent = isAr
         ? "خطة التمويل:"
@@ -1308,6 +1525,10 @@
       document.getElementById("btn_save").textContent = isAr
         ? "حفظ الصفقة في سجل Busultan"
         : "Save trade to Busultan log";
+
+      document.getElementById("btn_levelsCalc").textContent = isAr
+        ? "احسب مستويات الوقف والأهداف"
+        : "Calculate SL/TP levels";
 
       document.getElementById("noteText").innerHTML = isAr
         ? "• الحسابات تقريبية وتفترض أن عملة الحساب = عملة التسعير (حساب بالدولار وأدوات مسعّرة بالدولار).<br />" +
@@ -1345,10 +1566,15 @@
       document.getElementById("slPrice").placeholder = isAr ? "مثال: 1.08300" : "Ex: 1.08300";
       document.getElementById("tp1").placeholder = isAr ? "اختياري" : "Optional";
       document.getElementById("tp2").placeholder = isAr ? "اختياري" : "Optional";
+      document.getElementById("tp3").placeholder = isAr ? "اختياري" : "Optional";
       document.getElementById("leverage").placeholder = isAr ? "مثال: 100 أو 500" : "Ex: 100 or 500";
       document.getElementById("fundingSize").placeholder = isAr ? "مثال: 100000" : "Ex: 100000";
       document.getElementById("dailyLossPct").placeholder = isAr ? "مثال شائع: 5" : "Common: 5";
       document.getElementById("totalLossPct").placeholder = isAr ? "مثال شائع: 10" : "Common: 10";
+      document.getElementById("lotLevels").placeholder = isAr ? "مثال: 1 أو 0.1" : "Ex: 1 or 0.1";
+      document.getElementById("rr1Mul").placeholder = isAr ? "1" : "1";
+      document.getElementById("rr2Mul").placeholder = isAr ? "2" : "2";
+      document.getElementById("rr3Mul").placeholder = isAr ? "3" : "3";
 
       const inst = document.getElementById("instrumentType").options;
       if (isAr) {
@@ -1380,6 +1606,15 @@
         fp[2].text = "100K";
         fp[3].text = "200K";
         fp[4].text = "Custom";
+      }
+
+      const sideOpts = document.getElementById("sideLevels").options;
+      if (isAr) {
+        sideOpts[0].text = "شراء (Long)";
+        sideOpts[1].text = "بيع (Short)";
+      } else {
+        sideOpts[0].text = "Buy (Long)";
+        sideOpts[1].text = "Sell (Short)";
       }
 
       const isLight = document.body.classList.contains("light");
