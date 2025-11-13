@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حاسبة اللوت وإدارة المخاطر</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+      direction: rtl;
+    }
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 16px;
+      background: #ffffff;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    h2 {
+      font-size: 14px;
+      margin-top: 0;
+      margin-bottom: 16px;
+      text-align: center;
+      color: #555;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 18px;
+      padding: 12px;
+      width: 100%;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 15px;
+      border-radius: 8px;
+      border: none;
+      background: #0066cc;
+      color: #fff;
+    }
+    button:active {
+      opacity: 0.8;
+    }
+    .result {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #f0f7ff;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .error {
+      background: #ffe5e5;
+      color: #900;
+    }
+    .note {
+      font-size: 11px;
+      color: #666;
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+    .group-title {
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <h1>حاسبة اللوت</h1>
+    <h2>إدارة مخاطر لجميع الأدوات (فوركس، ين، ذهب، نفط، مؤشرات)</h2>
+
+    <div class="group-title">مدخلات الحساب</div>
+
+    <label>رصيد الحساب (عملة الحساب – مثال: USD):</label>
+    <input type="number" id="balance" placeholder="مثال: 10000">
+
+    <label>نسبة المخاطرة % من الحساب:</label>
+    <input type="number" id="riskPercent" placeholder="مثال: 1">
+
+    <label>سعر الدخول (Entry Price):</label>
+    <input type="number" id="entryPrice" step="0.00001" placeholder="مثال: 1.08500 أو 2350.0 للذهب">
+
+    <label>سعر وقف الخسارة (Stop Loss Price):</label>
+    <input type="number" id="slPrice" step="0.00001" placeholder="مثال: 1.08300">
+
+    <label>الرافعة المالية (Leverage):</label>
+    <input type="number" id="leverage" placeholder="مثال: 100 أو 500">
+
+    <label>نوع الأداة:</label>
+    <select id="instrumentType">
+      <option value="FOREX_4">فوركس 4 منازل (EURUSD, GBPUSD, ...)</option>
+      <option value="FOREX_JPY">أزواج الين (USDJPY, EURJPY, ...)</option>
+      <option value="GOLD">ذهب XAUUSD</option>
+      <option value="SILVER">فضة XAGUSD</option>
+      <option value="OIL">نفط (USOIL / UKOIL)</option>
+      <option value="INDEX">مؤشرات (US30, US500, NAS100, GER40, ...)</option>
+    </select>
+
+    <button onclick="calculateLot()">احسب حجم اللوت</button>
+
+    <div class="result" id="resultBox" style="display:none;"></div>
+
+    <div class="note">
+      • الحسابات تقريبية وتعتمد على أن عملة الحساب = عملة التسعير (مثال حساب بالدولار وأدوات مسعّرة بالدولار).<br>
+      • ضروري يكون في فرق فعلي بين سعر الدخول ووقف الخسارة لحساب عدد النقاط وحجم اللوت.<br>
+      • راقب شروط حجم العقد لكل أداة حسب البروكر؛ بعض الوسطاء يستخدمون عقود مختلفة للمؤشرات أو النفط.
+    </div>
+  </div>
+
+  <script>
+    function getInstrumentParams(type) {
+      // الإعدادات الافتراضية لكل مجموعة
+      switch (type) {
+        case 'FOREX_4':
+          return { contractSize: 100000, pipSize: 0.0001 };
+        case 'FOREX_JPY':
+          return { contractSize: 100000, pipSize: 0.01 };
+        case 'GOLD':
+          // كثير من الوسطاء: 1 لوت = 100 أونصة، حركة 0.1 = نقطة
+          return { contractSize: 100, pipSize: 0.1 };
+        case 'SILVER':
+          // مثال شائع: 1 لوت = 5000 أونصة، نقطة = 0.01
+          return { contractSize: 5000, pipSize: 0.01 };
+        case 'OIL':
+          // نفط: 1 لوت = 1000 برميل، نقطة = 0.01
+          return { contractSize: 1000, pipSize: 0.01 };
+        case 'INDEX':
+          // مؤشرات: نفترض 1 عقد قياسي = 1 وحدة، نقطة = 1
+          return { contractSize: 1, pipSize: 1 };
+        default:
+          return { contractSize: 100000, pipSize: 0.0001 };
+      }
+    }
+
+    function formatNumber(num, decimals) {
+      return Number(num).toFixed(decimals);
+    }
+
+    function calculateLot() {
+      const balance = parseFloat(document.getElementById('balance').value);
+      const riskPercent = parseFloat(document.getElementById('riskPercent').value);
+      const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+      const slPrice = parseFloat(document.getElementById('slPrice').value);
+      const leverage = parseFloat(document.getElementById('leverage').value);
+      const instrumentType = document.getElementById('instrumentType').value;
+
+      const resultBox = document.getElementById('resultBox');
+
+      if (isNaN(balance) || isNaN(riskPercent) || isNaN(entryPrice) ||
+          isNaN(slPrice) || isNaN(leverage)) {
+        resultBox.style.display = 'block';
+        resultBox.classList.add('error');
+        resultBox.innerHTML = "رجاءً تأكد من تعبئة جميع الحقول بشكل صحيح.";
+        return;
+      }
+
+      const params = getInstrumentParams(instrumentType);
+      const contractSize = params.contractSize;
+      const pipSize = params.pipSize;
+
+      // عدد النقاط بين الدخول ووقف الخسارة
+      const stopLossPips = Math.abs(entryPrice - slPrice) / pipSize;
+
+      if (stopLossPips <= 0) {
+        resultBox.style.display = 'block';
+        resultBox.classList.add('error');
+        resultBox.innerHTML = "سعر الدخول ووقف الخسارة متساويان أو الفرق صفر. عدّل القيم.";
+        return;
+      }
+
+      // قيمة النقطة لكل 1 لوت (تقريبية)
+      const pipValuePerLot = contractSize * pipSize;
+
+      // المبلغ المعرض للخسارة
+      const riskAmount = balance * (riskPercent / 100);
+
+      // حجم اللوت
+      const lotSize = riskAmount / (stopLossPips * pipValuePerLot);
+
+      // قيمة النقطة حسب حجم اللوت
+      const pipValueActual = pipValuePerLot * lotSize;
+
+      // القيمة الاسمية للمركز (Notional)
+      const positionNotional = contractSize * lotSize * entryPrice;
+
+      // الهامش المطلوب
+      const marginRequired = positionNotional / leverage;
+
+      resultBox.style.display = 'block';
+      resultBox.classList.remove('error');
+      resultBox.innerHTML =
+        "حجم اللوت المقترح: <b>" + formatNumber(lotSize, 3) + " لوت</b><br>" +
+        "عدد نقاط وقف الخسارة: <b>" + formatNumber(stopLossPips, 1) + " نقطة</b><br>" +
+        "المبلغ المعرض للخسارة: <b>" + formatNumber(riskAmount, 2) + "</b> من عملة الحساب<br>" +
+        "قيمة النقطة التقريبية: <b>" + formatNumber(pipValueActual, 2) + "</b> لكل نقطة<br>" +
+        "الهامش المطلوب تقريبياً: <b>" + formatNumber(marginRequired, 2) + "</b>";
+    }
+  </script>
+
+</body>
+</html>
