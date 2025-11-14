@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Busultan – حاسبة اللوت</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     * {
       margin: 0;
@@ -26,42 +27,44 @@
       background-position: center;
     }
 
-    .app {
+    .card {
       width: 100%;
-      max-width: 960px;
-      background: radial-gradient(circle at top left, rgba(148,163,184,0.14), transparent 60%),
-                  rgba(15,23,42,0.92);
-      border-radius: 26px;
-      padding: 26px 28px 30px;
-      box-shadow: 0 28px 80px rgba(0,0,0,0.9);
+      max-width: 980px;
+      background: radial-gradient(circle at top left, rgba(148,163,184,0.20), transparent 60%),
+                  rgba(15,23,42,0.96);
+      border-radius: 28px;
+      padding: 26px 30px 26px;
+      box-shadow: 0 32px 90px rgba(0,0,0,0.95);
       backdrop-filter: blur(18px);
     }
 
-    .header {
+    .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
 
     .brand {
-      text-align: right;
+      text-align: center;
+      flex: 1;
     }
 
     .brand-title {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
     }
 
     .brand-sub {
-      font-size: 12px;
+      font-size: 11px;
       opacity: 0.8;
+      margin-top: 4px;
     }
 
-    /* ===================== 3D CHART LOGO ===================== */
+    /* ----------------- 3D LOGO ----------------- */
     .logo-3d {
-      width: 92px;
-      height: 92px;
+      width: 90px;
+      height: 90px;
       border-radius: 50%;
       padding: 4px;
       background:
@@ -75,42 +78,37 @@
         );
       box-shadow:
         0 0 0 2px rgba(15,23,42,0.8),
-        0 18px 35px rgba(0,0,0,0.8);
+        0 18px 35px rgba(0,0,0,0.9);
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      transform: translateZ(0);
     }
 
     .logo-3d-inner {
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      background:
-        radial-gradient(circle at 20% 0%, #1e293b, #020617 70%);
+      background: radial-gradient(circle at 20% 0%, #1e293b, #020617 70%);
       position: relative;
       overflow: hidden;
-      border: 2px solid rgba(255,255,255,0.18);
+      border: 2px solid rgba(255,255,255,0.16);
       box-shadow:
         inset 0 10px 16px rgba(255,255,255,0.08),
         inset 0 -12px 18px rgba(15,23,42,0.95);
     }
 
-    /* شاشة الشارت */
     .logo-screen {
       position: absolute;
       inset: 16px 14px 18px 16px;
       border-radius: 14px;
-      background:
-        linear-gradient(to bottom, rgba(15,23,42,0.85), rgba(15,23,42,0.95));
+      background: linear-gradient(to bottom, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
       box-shadow:
         0 0 0 1px rgba(148,163,184,0.4),
         0 12px 18px rgba(0,0,0,0.9);
       overflow: hidden;
     }
 
-    /* Grid خفيف */
     .logo-screen::before {
       content: "";
       position: absolute;
@@ -122,7 +120,6 @@
       opacity: 0.55;
     }
 
-    /* أعمدة الشارت (bars) */
     .logo-bars {
       position: absolute;
       bottom: 10px;
@@ -138,9 +135,8 @@
     .bar {
       flex: 1;
       border-radius: 999px;
-      background: linear-gradient(to top, rgba(15,23,42,0.4), rgba(34,197,94,0.7));
-      box-shadow: 0 0 8px rgba(34,197,94,0.65);
-      transform-origin: bottom;
+      background: linear-gradient(to top, rgba(15,23,42,0.4), rgba(34,197,94,0.8));
+      box-shadow: 0 0 8px rgba(34,197,94,0.75);
     }
 
     .bar:nth-child(1) { height: 30%; }
@@ -149,7 +145,6 @@
     .bar:nth-child(4) { height: 80%; }
     .bar:nth-child(5) { height: 55%; }
 
-    /* خط منحني (line chart) */
     .logo-line {
       position: absolute;
       inset: 12px 10px 20px 10px;
@@ -159,19 +154,17 @@
     .logo-line svg {
       width: 100%;
       height: 100%;
-      filter:
-        drop-shadow(0 0 5px rgba(56,189,248,0.9));
+      filter: drop-shadow(0 0 5px rgba(56,189,248,0.9));
     }
 
     .logo-line path {
       fill: none;
       stroke: url(#gradLine);
-      stroke-width: 2.2;
+      stroke-width: 2.3;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
 
-    /* نقطة نهائية */
     .logo-dot {
       position: absolute;
       right: 13px;
@@ -186,30 +179,18 @@
       z-index: 3;
     }
 
-    /* توهّج خفيف خلف اللوقو لزيادة إحساس 3D */
-    .logo-3d-glow {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      box-shadow:
-        0 0 30px rgba(56,189,248,0.6),
-        0 0 50px rgba(37,99,235,0.45);
-      opacity: 0.25;
-      pointer-events: none;
-    }
-
-    /* ===================== FORM ===================== */
+    /* ----------------- FORM ----------------- */
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(2,minmax(0,1fr));
+      grid-template-columns: repeat(2, minmax(0,1fr));
       gap: 14px 18px;
       margin-top: 10px;
     }
 
-    @media (max-width: 800px) {
-      .header {
+    @media (max-width: 820px) {
+      .card-header {
         flex-direction: row-reverse;
-        gap: 16px;
+        gap: 12px;
       }
       .form-grid {
         grid-template-columns: 1fr;
@@ -218,26 +199,35 @@
 
     label {
       display: block;
-      font-size: 13px;
+      font-size: 12px;
       margin-bottom: 4px;
-      opacity: 0.85;
+      opacity: 0.9;
+      text-align: right;
     }
 
-    input, select {
+    .hint {
+      font-size: 10px;
+      opacity: 0.65;
+      margin-bottom: 3px;
+      text-align: right;
+    }
+
+    input,
+    select {
       width: 100%;
       border-radius: 12px;
       border: none;
       padding: 10px 12px;
-      font-size: 15px;
+      font-size: 14px;
       color: #e5e7eb;
-      background: rgba(15,23,42,0.9);
+      background: rgba(15,23,42,0.96);
       outline: none;
       box-shadow: inset 0 0 0 1px rgba(148,163,184,0.45);
-      transition: box-shadow 0.15s ease, background 0.15s ease, transform 0.08s ease;
+      transition: box-shadow 0.15s ease, background 0.15s.ease, transform 0.08s.ease;
     }
 
     input::placeholder {
-      color: rgba(148,163,184,0.6);
+      color: rgba(148,163,184,0.7);
     }
 
     input:focus,
@@ -245,48 +235,42 @@
       box-shadow:
         inset 0 0 0 1px rgba(56,189,248,0.75),
         0 0 0 1px rgba(15,23,42,0.9);
-      background: rgba(15,23,42,0.98);
+      background: rgba(15,23,42,1);
       transform: translateY(-1px);
     }
 
-    .full-row {
-      grid-column: 1 / -1;
-    }
+    .full-row { grid-column: 1 / -1; }
 
     .btn {
       margin-top: 16px;
       width: 100%;
       border-radius: 999px;
       padding: 12px 16px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       border: none;
       cursor: pointer;
       background: linear-gradient(135deg,#22c55e,#16a34a);
       color: #f9fafb;
-      box-shadow: 0 18px 30px rgba(22,163,74,0.7);
-      transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+      box-shadow: 0 18px 32px rgba(22,163,74,0.8);
+      transition: transform 0.1s ease, box-shadow 0.1s.ease, opacity 0.1s.ease;
     }
 
     .btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 22px 38px rgba(22,163,74,0.8);
+      box-shadow: 0 22px 40px rgba(22,163,74,0.9);
     }
 
-    .btn:active {
-      transform: translateY(0);
-      box-shadow: 0 12px 24px rgba(22,163,74,0.7);
-    }
-
-    .results {
-      margin-top: 18px;
+    .results-box {
+      margin-top: 16px;
       padding: 14px 16px;
       border-radius: 16px;
-      background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,0.96));
-      box-shadow: inset 0 0 0 1px rgba(30,64,175,0.6);
-      font-size: 14px;
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.98), rgba(15,23,42,1));
+      box-shadow: inset 0 0 0 1px rgba(30,64,175,0.7);
+      font-size: 13px;
       line-height: 1.9;
       min-height: 40px;
+      text-align: right;
     }
 
     .results-title {
@@ -294,7 +278,7 @@
       margin-bottom: 4px;
     }
 
-    .results span.value {
+    .value {
       font-weight: 600;
       color: #4ade80;
     }
@@ -303,156 +287,169 @@
       margin-top: 6px;
       font-size: 11px;
       opacity: 0.75;
+      text-align: center;
     }
   </style>
 </head>
-<body>
 
-<div class="app">
-  <div class="header">
-    <!-- اللوقو 3D -->
-    <div class="logo-3d">
-      <div class="logo-3d-inner">
-        <div class="logo-screen"></div>
-        <div class="logo-bars">
-          <div class="bar"></div>
-          <div class="bar"></div>
-          <div class="bar"></div>
-          <div class="bar"></div>
-          <div class="bar"></div>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <!-- اللوقو 3D على اليمين -->
+      <div class="logo-3d">
+        <div class="logo-3d-inner">
+          <div class="logo-screen"></div>
+
+          <div class="logo-bars">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+
+          <div class="logo-line">
+            <svg viewBox="0 0 100 50" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="gradLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#0ea5e9"/>
+                  <stop offset="40%" stop-color="#22c55e"/>
+                  <stop offset="100%" stop-color="#22c55e"/>
+                </linearGradient>
+              </defs>
+              <path d="M2 40 L18 32 L32 36 L48 26 L64 30 L82 18 L98 22" />
+            </svg>
+          </div>
+
+          <div class="logo-dot"></div>
         </div>
-        <div class="logo-line">
-          <svg viewBox="0 0 100 50" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="gradLine" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#0ea5e9"/>
-                <stop offset="40%" stop-color="#22c55e"/>
-                <stop offset="100%" stop-color="#22c55e"/>
-              </linearGradient>
-            </defs>
-            <path d="M2 40 L18 32 L32 36 L48 26 L64 30 L82 18 L98 22" />
-          </svg>
-        </div>
-        <div class="logo-dot"></div>
-        <div class="logo-3d-glow"></div>
+      </div>
+
+      <!-- العنوان في الوسط -->
+      <div class="brand">
+        <div class="brand-title">حاسبة اللوت – Busultan</div>
+        <div class="brand-sub">إدارة مخاطرة احترافية لرسم حجم العقد والأهداف</div>
+      </div>
+
+      <!-- فراغ يسار للتوازن -->
+      <div style="width:90px;"></div>
+    </div>
+
+    <!-- الفورم -->
+    <div class="form-grid">
+      <div>
+        <label for="sl">وقف الخسارة</label>
+        <div class="hint">سعر وقف الخسارة</div>
+        <input id="sl" type="number" step="0.00001" placeholder="مثال: 155.80">
+      </div>
+
+      <div>
+        <label for="entry">سعر الدخول</label>
+        <div class="hint">مثال: 1.08500 أو 156.30</div>
+        <input id="entry" type="number" step="0.00001" placeholder="سعر الدخول">
+      </div>
+
+      <div>
+        <label for="risk">نسبة المخاطرة %</label>
+        <div class="hint">مثال: 1 = 1% من رصيد الحساب</div>
+        <input id="risk" type="number" step="0.1" value="1">
+      </div>
+
+      <div>
+        <label for="balance">حجم الحساب (USD)</label>
+        <div class="hint">مثال: 10000</div>
+        <input id="balance" type="number" step="0.01" placeholder="10000">
+      </div>
+
+      <div class="full-row">
+        <label for="pair">زوج / أداة التداول</label>
+        <div class="hint">اختر نوع الأداة لحساب النقطة</div>
+        <select id="pair">
+          <option value="JPY">أزواج الين JPY</option>
+          <option value="USD">أزواج الدولار / رئيسية</option>
+          <option value="GOLD">XAUUSD – ذهب</option>
+        </select>
       </div>
     </div>
 
-    <!-- النص -->
-    <div class="brand">
-      <div class="brand-title">Busultan – حاسبة اللوت</div>
-      <div class="brand-sub">إدارة مخاطرة احترافية لرسم حجم العقد والأهداف</div>
+    <button class="btn" onclick="calcLot()">احسب</button>
+
+    <div id="results" class="results-box">
+      <div class="results-title">النتائج ستظهر هنا بعد الحساب.</div>
+    </div>
+
+    <div class="note">
+      الحساب تقريبي تعليمي؛ القيم الفعلية تختلف حسب شركة الوساطة، نوع الحساب، قيمة النقطة، السبريد والعمولات.
     </div>
   </div>
 
-  <!-- نموذج الإدخال -->
-  <div class="form-grid">
-    <div>
-      <label for="entry">سعر الدخول</label>
-      <input id="entry" type="number" step="0.00001" placeholder="مثال: 156.30 أو 1.08500">
-    </div>
-    <div>
-      <label for="sl">وقف الخسارة</label>
-      <input id="sl" type="number" step="0.00001" placeholder="سعر وقف الخسارة">
-    </div>
-    <div>
-      <label for="balance">حجم الحساب (USD)</label>
-      <input id="balance" type="number" step="0.01" placeholder="مثال: 10000">
-    </div>
-    <div>
-      <label for="risk">نسبة المخاطرة %</label>
-      <input id="risk" type="number" step="0.1" value="1">
-    </div>
-    <div class="full-row">
-      <label for="pair">زوج / أداة التداول</label>
-      <select id="pair">
-        <option value="JPY">أزواج الين JPY</option>
-        <option value="USD">أزواج الدولار / رئيسية</option>
-        <option value="GOLD">XAUUSD – ذهب</option>
-      </select>
-    </div>
-  </div>
+  <script>
+    function calcLot() {
+      const entry   = parseFloat(document.getElementById('entry').value);
+      const sl      = parseFloat(document.getElementById('sl').value);
+      const balance = parseFloat(document.getElementById('balance').value);
+      const riskPct = parseFloat(document.getElementById('risk').value);
+      const pair    = document.getElementById('pair').value;
+      const out     = document.getElementById('results');
 
-  <button class="btn" onclick="calcLot()">احسب</button>
+      if (!isFinite(entry) || !isFinite(sl) || !isFinite(balance) || !isFinite(riskPct) ||
+          balance <= 0 || riskPct <= 0) {
+        out.innerHTML = "<div class='results-title'>تأكد من تعبئة كل الحقول الأساسية بشكل صحيح.</div>";
+        return;
+      }
 
-  <div class="results" id="results">
-    <div class="results-title">النتائج ستظهر هنا بعد الحساب.</div>
-  </div>
-  <div class="note">
-    الحساب تقريبي تعليمي: القيم الحقيقية تختلف حسب شركة الوساطة، نوع الحساب، قيمة النقطة، السبريد والعمولات.
-  </div>
-</div>
+      // حجم النقطة حسب الأداة
+      let pipSize;
+      if (pair === 'JPY') pipSize = 0.01;
+      else if (pair === 'GOLD') pipSize = 0.1;
+      else pipSize = 0.0001;
 
-<script>
-function calcLot() {
-  const entry    = parseFloat(document.getElementById('entry').value);
-  const sl       = parseFloat(document.getElementById('sl').value);
-  const balance  = parseFloat(document.getElementById('balance').value);
-  const riskPct  = parseFloat(document.getElementById('risk').value);
-  const pair     = document.getElementById('pair').value;
-  const resDiv   = document.getElementById('results');
+      const priceDiff = Math.abs(entry - sl);
+      const pips = priceDiff / pipSize;
 
-  if (!isFinite(entry) || !isFinite(sl) || !isFinite(balance) || !isFinite(riskPct) ||
-      balance <= 0 || riskPct <= 0) {
-    resDiv.innerHTML = "<span class='results-title'>تأكد من تعبئة كل الحقول الأساسية بشكل صحيح.</span>";
-    return;
-  }
+      if (!isFinite(pips) || pips <= 0) {
+        out.innerHTML = "<div class='results-title'>مسافة وقف الخسارة صفر تقريبًا – عدّل سعر الدخول أو وقف الخسارة.</div>";
+        return;
+      }
 
-  // حجم النقطة حسب نوع الأداة
-  let pipSize;
-  if (pair === 'JPY') pipSize = 0.01;
-  else if (pair === 'GOLD') pipSize = 0.1;
-  else pipSize = 0.0001; // أزواج رئيسية
+      // قيمة النقطة لكل لوت قياسي (تقريبية)
+      let pipValuePerLot;
+      if (pair === 'JPY') pipValuePerLot = 9.5;
+      else if (pair === 'GOLD') pipValuePerLot = 10;
+      else pipValuePerLot = 10;
 
-  // مسافة الوقف بالنقاط
-  const priceDiff = Math.abs(entry - sl);
-  const pips = priceDiff / pipSize;
+      const riskAmount = balance * (riskPct / 100);
+      const lot = riskAmount / (pips * pipValuePerLot);
 
-  if (!isFinite(pips) || pips <= 0) {
-    resDiv.innerHTML = "<span class='results-title'>مسافة وقف الخسارة صفر تقريبًا – عدّل السعر أو الوقف.</span>";
-    return;
-  }
+      // اتجاه الصفقة: إذا SL تحت الدخول => شراء
+      const isBuy = sl < entry;
+      const step = priceDiff;
+      let tp1, tp2, tp3;
 
-  // قيمة النقطة لكل لوت قياسي (تقريبية)
-  let pipValuePerLot;
-  if (pair === 'JPY') pipValuePerLot = 9.5;
-  else if (pair === 'GOLD') pipValuePerLot = 10;
-  else pipValuePerLot = 10;
+      if (isBuy) {
+        tp1 = entry + 2 * step;
+        tp2 = entry + 3 * step;
+        tp3 = entry + 4 * step;
+      } else {
+        tp1 = entry - 2 * step;
+        tp2 = entry - 3 * step;
+        tp3 = entry - 4 * step;
+      }
 
-  const riskAmount = balance * (riskPct / 100);
-  const lot = riskAmount / (pips * pipValuePerLot);
+      let dec = 5;
+      if (pipSize === 0.01) dec = 3;
+      if (pipSize === 0.1)  dec = 2;
 
-  // تحديد اتجاه الصفقة من موقع SL
-  const isBuy = sl < entry; // إذا SL تحت الدخول -> شراء
-  let tp1, tp2, tp3;
-  const step = priceDiff;
-
-  if (isBuy) {
-    tp1 = entry + 2 * step;
-    tp2 = entry + 3 * step;
-    tp3 = entry + 4 * step;
-  } else {
-    tp1 = entry - 2 * step;
-    tp2 = entry - 3 * step;
-    tp3 = entry - 4 * step;
-  }
-
-  // عدد الخانات العشرية حسب pipSize
-  let dec = 5;
-  if (pipSize === 0.01) dec = 3;
-  if (pipSize === 0.1) dec = 2;
-
-  resDiv.innerHTML = `
-    <div class="results-title">نتائج الصفقة:</div>
-    حجم اللوت المقترح: <span class="value">${lot.toFixed(2)}</span><br>
-    عدد النقاط حتى وقف الخسارة: <span class="value">${pips.toFixed(1)} نقطة</span><br>
-    المبلغ المعرض للمخاطرة: <span class="value">${riskAmount.toFixed(2)} USD</span><br>
-    الهدف 1 (ضعفين الخسارة): <span class="value">${tp1.toFixed(dec)}</span><br>
-    الهدف 2 (3 أضعاف الخسارة): <span class="value">${tp2.toFixed(dec)}</span><br>
-    الهدف 3 (4 أضعاف الخسارة): <span class="value">${tp3.toFixed(dec)}</span>
-  `;
-}
-</script>
-
+      out.innerHTML = `
+        <div class="results-title">نتائج الصفقة:</div>
+        حجم اللوت المقترح: <span class="value">${lot.toFixed(2)}</span><br>
+        عدد النقاط حتى وقف الخسارة: <span class="value">${pips.toFixed(1)} نقطة</span><br>
+        المبلغ المعرض للمخاطرة: <span class="value">${riskAmount.toFixed(2)} USD</span><br>
+        الهدف 1 (ضعفين الخسارة): <span class="value">${tp1.toFixed(dec)}</span><br>
+        الهدف 2 (3 أضعاف الخسارة): <span class="value">${tp2.toFixed(dec)}</span><br>
+        الهدف 3 (4 أضعاف الخسارة): <span class="value">${tp3.toFixed(dec)}</span>
+      `;
+    }
+  </script>
 </body>
 </html>
