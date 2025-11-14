@@ -15,23 +15,31 @@
 
     body {
       min-height: 100vh;
-      background: radial-gradient(circle at top left, #1c2138, #040510 55%, #030308);
+      background:
+        radial-gradient(circle at top left, #202847, #050614 55%, #020208);
       color: #f5f7ff;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 40px 10px;
+      padding: 32px 10px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 980px;
+      border-radius: 26px;
+      padding: 2px;
+      background:
+        linear-gradient(135deg, rgba(90, 151, 255, 0.9), rgba(255, 145, 77, 0.9));
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.85);
     }
 
     .card {
       width: 100%;
-      max-width: 920px;
-      background: radial-gradient(circle at top right, #181c31, #050610 55%);
-      border-radius: 22px;
-      padding: 24px 24px 26px;
-      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at top right, #1a1f37, #050613 55%);
+      padding: 22px 22px 24px;
     }
 
     .card-header {
@@ -47,22 +55,23 @@
       gap: 12px;
     }
 
-    /* لوجو شموع يابانية */
+    /* LOGO شموع يابانية */
     .logo-candles {
-      width: 46px;
-      height: 46px;
-      border-radius: 18px;
-      background: radial-gradient(circle at top, #283356, #0c0f21);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      box-shadow: 0 0 18px rgba(0, 0, 0, 0.7);
+      width: 52px;
+      height: 52px;
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at top, #343f6a, #090c21 65%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
       position: relative;
       overflow: hidden;
     }
 
     .logo-candle {
       position: absolute;
-      bottom: 9px;
-      width: 7px;
+      bottom: 10px;
+      width: 8px;
       border-radius: 999px;
     }
 
@@ -71,29 +80,29 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      top: -7px;
-      bottom: -7px;
+      top: -8px;
+      bottom: -8px;
       width: 2px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
     }
 
     .logo-candle:nth-child(1) {
-      left: 9px;
-      height: 18px;
+      left: 11px;
+      height: 20px;
       background: #3f8cff;
     }
 
     .logo-candle:nth-child(2) {
-      left: 19px;
-      height: 26px;
+      left: 23px;
+      height: 30px;
       background: #ff5c7a;
     }
 
     .logo-candle:nth-child(3) {
-      left: 29px;
-      height: 15px;
-      background: #43d39b;
+      left: 35px;
+      height: 17px;
+      background: #35d39b;
     }
 
     .brand {
@@ -104,7 +113,7 @@
 
     .brand-title {
       font-weight: 700;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.04em;
       font-size: 18px;
     }
 
@@ -126,20 +135,46 @@
       align-items: center;
       gap: 6px;
       font-size: 11px;
-      opacity: 0.85;
+      opacity: 0.86;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: #ffb341;
-      box-shadow: 0 0 10px rgba(255, 179, 65, 0.9);
+      box-shadow: 0 0 10px rgba(255, 179, 65, 0.95);
+    }
+
+    .header-tabs {
+      display: inline-flex;
+      gap: 6px;
+      padding: 3px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 6px;
+    }
+
+    .header-tab {
+      font-size: 10px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      opacity: 0.78;
+    }
+
+    .header-tab.active {
+      background: linear-gradient(135deg, #3f8cff, #945bff);
+      opacity: 1;
     }
 
     h2 {
       font-size: 18px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       text-align: center;
     }
 
@@ -150,10 +185,44 @@
       margin-bottom: 18px;
     }
 
+    .layout {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 850px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* FORM PANEL */
+    .panel {
+      border-radius: 18px;
+      background: radial-gradient(circle at top left, #181e35, #050613 60%);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 14px 14px 18px;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      opacity: 0.88;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title span {
+      font-size: 10px;
+      opacity: 0.6;
+    }
+
     form {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px 20px;
+      gap: 12px 16px;
     }
 
     @media (max-width: 700px) {
@@ -165,7 +234,7 @@
     .field {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
       font-size: 12px;
     }
 
@@ -182,7 +251,7 @@
     select {
       width: 100%;
       border-radius: 11px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       background: rgba(5, 6, 16, 0.9);
       color: #f5f7ff;
       padding: 8px 11px;
@@ -213,11 +282,12 @@
     }
 
     .btn-row {
-      margin-top: 10px;
+      margin-top: 8px;
       display: flex;
       gap: 10px;
       justify-content: flex-start;
       flex-wrap: wrap;
+      grid-column: 1 / -1;
     }
 
     button {
@@ -238,7 +308,7 @@
     .btn-primary {
       background: linear-gradient(135deg, #3f8cff, #945bff);
       color: #ffffff;
-      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.85);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.9);
     }
 
     .btn-primary:hover {
@@ -256,32 +326,34 @@
       transform: translateY(-1px);
     }
 
-    .results {
-      margin-top: 18px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    /* RESULTS PANEL */
+    .results-panel {
+      border-radius: 18px;
+      background: radial-gradient(circle at top left, #14192b, #050612 60%);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 14px 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .results-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
       font-size: 12px;
     }
 
-    @media (max-width: 700px) {
-      .results {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
     @media (max-width: 500px) {
-      .results {
+      .results-grid {
         grid-template-columns: 1fr;
       }
     }
 
     .result-box {
-      background: radial-gradient(circle at top left, #181c33, #070818);
+      background: radial-gradient(circle at top left, #1c2340, #070818);
       border-radius: 13px;
-      padding: 10px 12px;
+      padding: 9px 11px;
       border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
@@ -303,172 +375,224 @@
     }
 
     .warning {
-      grid-column: 1 / -1;
       font-size: 10px;
       color: #ffb341;
-      opacity: 0.85;
+      opacity: 0.9;
+      margin-top: 2px;
+    }
+
+    .pair-tag {
+      font-size: 11px;
+      opacity: 0.75;
+    }
+
+    .pair-tag span {
+      opacity: 0.55;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="card-header">
-      <div class="brand-wrap">
-        <div class="logo-candles">
-          <div class="logo-candle"></div>
-          <div class="logo-candle"></div>
-          <div class="logo-candle"></div>
-        </div>
-        <div class="brand">
-          <div class="brand-title">Busultan Trading</div>
-          <div class="brand-sub">
-            إدارة مخاطر احترافية
-            <span class="badge">MULTI-ASSET • FUNDING • R:R</span>
+  <div class="shell">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="brand-wrap">
+            <div class="logo-candles">
+              <div class="logo-candle"></div>
+              <div class="logo-candle"></div>
+              <div class="logo-candle"></div>
+            </div>
+            <div class="brand">
+              <div class="brand-title">Busultan Trading</div>
+              <div class="brand-sub">
+                إدارة مخاطر احترافية
+                <span class="badge">MULTI-ASSET • FUNDING • R:R</span>
+              </div>
+            </div>
+          </div>
+          <div class="header-tabs">
+            <div class="header-tab active">Position Sizing</div>
+            <div class="header-tab">Risk Engine</div>
           </div>
         </div>
+
+        <div class="lang-toggle">
+          AR
+          <span class="dot"></span>
+        </div>
       </div>
 
-      <div class="lang-toggle">
-        AR
-        <span class="dot"></span>
-      </div>
-    </div>
-
-    <h2>حاسبة اللوت المتقدمة</h2>
-    <div class="subtitle">
-      حساب حجم العقد، نسبة المخاطرة، والهامش المطلوب بناءً على إعدادات الصفقة.
-    </div>
-
-    <form id="lotForm">
-      <div class="field">
-        <label for="balance">رصيد الحساب (USD)</label>
-        <span class="example">مثال: 10000</span>
-        <input id="balance" type="number" step="0.01" placeholder="10000" required />
+      <h2>حاسبة اللوت المتقدمة</h2>
+      <div class="subtitle">
+        حدد رصيد الحساب، نسبة المخاطرة، وسعر الدخول/الوقف – والأداة – وسيتم حساب حجم اللوت،
+        قيمة المخاطرة والهامش المطلوب بشكل آلي.
       </div>
 
-      <div class="field">
-        <label for="risk">نسبة المخاطرة من الحساب %</label>
-        <span class="example">مثال: 1 تعني 1% من الرصيد</span>
-        <input id="risk" type="number" step="0.01" placeholder="1" required />
-      </div>
+      <div class="layout">
+        <!-- FORM SIDE -->
+        <div class="panel">
+          <div class="panel-title">
+            إعدادات الصفقة
+            <span>Step 1 – Inputs</span>
+          </div>
+          <form id="lotForm">
+            <div class="field">
+              <label for="balance">رصيد الحساب (USD)</label>
+              <span class="example">مثال: 10000</span>
+              <input id="balance" type="number" step="0.01" placeholder="10000" required />
+            </div>
 
-      <div class="field">
-        <label for="entry">سعر الدخول (Entry)</label>
-        <span class="example">مثال EURUSD: 1.08500 أو USDJPY: 156.30</span>
-        <input id="entry" type="number" step="0.00001" placeholder="1.08500" required />
-      </div>
+            <div class="field">
+              <label for="risk">نسبة المخاطرة من الحساب %</label>
+              <span class="example">1 = مخاطرة 1% من رصيد الحساب</span>
+              <input id="risk" type="number" step="0.01" placeholder="1" required />
+            </div>
 
-      <div class="field">
-        <label for="sl">سعر وقف الخسارة (SL)</label>
-        <span class="example">مثال: 1.08300</span>
-        <input id="sl" type="number" step="0.00001" placeholder="1.08300" required />
-      </div>
+            <div class="field">
+              <label for="entry">سعر الدخول (Entry)</label>
+              <span class="example">مثال EURUSD: 1.08500 – USDJPY: 156.30</span>
+              <input id="entry" type="number" step="0.00001" placeholder="1.08500" required />
+            </div>
 
-      <div class="field full-row">
-        <label for="symbol">زوج / أداة التداول</label>
-        <span class="example">
-          أزواج رئيسية + أزواج الين الياباني + ذهب ومؤشرات
-        </span>
-        <select id="symbol">
-          <!-- أزواج رئيسية -->
-          <option value="EURUSD" data-group="major">EURUSD (فوركس رئيسي)</option>
-          <option value="GBPUSD" data-group="major">GBPUSD (فوركس رئيسي)</option>
-          <option value="AUDUSD" data-group="major">AUDUSD</option>
-          <option value="NZDUSD" data-group="major">NZDUSD</option>
-          <option value="USDCHF" data-group="major">USDCHF</option>
-          <option value="USDCAD" data-group="major">USDCAD</option>
+            <div class="field">
+              <label for="sl">سعر وقف الخسارة (SL)</label>
+              <span class="example">ضع سعر وقف الخسارة الفعلي للصفقة</span>
+              <input id="sl" type="number" step="0.00001" placeholder="1.08300" required />
+            </div>
 
-          <!-- أزواج الين الياباني -->
-          <option value="USDJPY" data-group="jpy">USDJPY (زوج ين)</option>
-          <option value="EURJPY" data-group="jpy">EURJPY (زوج ين)</option>
-          <option value="GBPJPY" data-group="jpy">GBPJPY (زوج ين)</option>
-          <option value="AUDJPY" data-group="jpy">AUDJPY (زوج ين)</option>
-          <option value="NZDJPY" data-group="jpy">NZDJPY (زوج ين)</option>
-          <option value="CHFJPY" data-group="jpy">CHFJPY (زوج ين)</option>
-          <option value="CADJPY" data-group="jpy">CADJPY (زوج ين)</option>
+            <div class="field full-row">
+              <label for="symbol">زوج / أداة التداول</label>
+              <span class="example">أزواج رئيسية، أزواج ين، كروس، ذهب/فضة، نفط، مؤشرات</span>
+              <select id="symbol">
+                <!-- COMMODITIES / FUTURES -->
+                <option value="XAUUSD" data-group="metals">XAUUSD – Gold (ذهب)</option>
+                <option value="XAGUSD" data-group="metals">XAGUSD – Silver (فضة)</option>
+                <option value="WTI" data-group="oil">WTI – Crude Oil</option>
+                <option value="US100" data-group="indices">US100 – Nasdaq</option>
 
-          <!-- ذهب ومؤشرات -->
-          <option value="XAUUSD" data-group="gold">XAUUSD (ذهب)</option>
-          <option value="US30" data-group="indices">US30 (داو جونز)</option>
-          <option value="NAS100" data-group="indices">NAS100 (ناسداك)</option>
-        </select>
-      </div>
+                <!-- MAJOR FOREX -->
+                <option value="EURUSD" data-group="major">EURUSD – Major</option>
+                <option value="USDJPY" data-group="jpy">USDJPY – JPY Pair</option>
+                <option value="AUDUSD" data-group="major">AUDUSD – Major</option>
+                <option value="NZDUSD" data-group="major">NZDUSD – Major</option>
+                <option value="USDCHF" data-group="major">USDCHF – Major</option>
+                <option value="USDCAD" data-group="major">USDCAD – Major</option>
 
-      <div class="field">
-        <label for="tp1">هدف 1 (TP1) – اختياري</label>
-        <span class="example">للمتابعة فقط، لا يؤثر على الحساب</span>
-        <input id="tp1" type="number" step="0.00001" placeholder="—" />
-      </div>
+                <!-- JPY CROSSES -->
+                <option value="GBPJPY" data-group="jpy">GBPJPY – JPY Cross</option>
+                <option value="AUDJPY" data-group="jpy">AUDJPY – JPY Cross</option>
+                <option value="EURJPY" data-group="jpy">EURJPY – JPY Cross</option>
 
-      <div class="field">
-        <label for="tp2">هدف 2 (TP2) – اختياري</label>
-        <input id="tp2" type="number" step="0.00001" placeholder="—" />
-      </div>
+                <!-- CROSSES -->
+                <option value="EURCAD" data-group="cross">EURCAD – Cross</option>
+                <option value="AUDCAD" data-group="cross">AUDCAD – Cross</option>
+                <option value="EURAUD" data-group="cross">EURAUD – Cross</option>
+              </select>
+            </div>
 
-      <div class="field">
-        <label for="tp3">هدف 3 (TP3) – اختياري</label>
-        <input id="tp3" type="number" step="0.00001" placeholder="—" />
-      </div>
+            <div class="field">
+              <label for="tp1">هدف 1 (TP1) – اختياري</label>
+              <span class="example">للمتابعة فقط – لا يدخل في الحساب</span>
+              <input id="tp1" type="number" step="0.00001" placeholder="—" />
+            </div>
 
-      <div class="field">
-        <label for="leverage">الرافعة المالية (Leverage)</label>
-        <span class="example">مثال: 100 أو 500</span>
-        <input id="leverage" type="number" step="1" placeholder="500" value="500" />
-      </div>
+            <div class="field">
+              <label for="tp2">هدف 2 (TP2) – اختياري</label>
+              <input id="tp2" type="number" step="0.00001" placeholder="—" />
+            </div>
 
-      <div class="full-row btn-row">
-        <button type="submit" class="btn-primary">
-          احسب اللوت
-        </button>
-        <button type="button" id="resetBtn" class="btn-ghost">
-          مسح الحقول
-        </button>
-      </div>
-    </form>
+            <div class="field">
+              <label for="tp3">هدف 3 (TP3) – اختياري</label>
+              <input id="tp3" type="number" step="0.00001" placeholder="—" />
+            </div>
 
-    <div class="results" id="results" style="display:none;">
-      <div class="result-box">
-        <div class="result-label">حجم اللوت المقترح</div>
-        <div class="result-value" id="lotSize">0.00</div>
-        <div class="result-hint">لوت قياسي تقريبًا</div>
-      </div>
+            <div class="field">
+              <label for="leverage">الرافعة المالية (Leverage)</label>
+              <span class="example">مثال: 100 أو 500</span>
+              <input id="leverage" type="number" step="1" placeholder="500" value="500" />
+            </div>
 
-      <div class="result-box">
-        <div class="result-label">المبلغ المعرض للمخاطرة (USD)</div>
-        <div class="result-value" id="riskAmount">0.00</div>
-        <div class="result-hint">قيمة الخسارة إذا ضرب وقف الخسارة</div>
-      </div>
+            <div class="btn-row">
+              <button type="submit" class="btn-primary">
+                احسب حجم اللوت
+              </button>
+              <button type="button" id="resetBtn" class="btn-ghost">
+                مسح الحقول
+              </button>
+            </div>
+          </form>
+        </div>
 
-      <div class="result-box">
-        <div class="result-label">عدد النقاط حتى وقف الخسارة</div>
-        <div class="result-value" id="pipDistance">0.0</div>
-        <div class="result-hint">محسوبة حسب نوع الأداة</div>
-      </div>
+        <!-- RESULTS SIDE -->
+        <div class="results-panel">
+          <div class="panel-title">
+            مخرجات الحاسبة
+            <span>Step 2 – Outputs</span>
+          </div>
+          <div id="results" style="display:none;">
+            <div class="pair-tag">
+              الأداة الحالية:
+              <span id="currentSymbol">—</span>
+            </div>
 
-      <div class="result-box">
-        <div class="result-label">الهامش المطلوب تقريبا</div>
-        <div class="result-value" id="marginRequired">0.00</div>
-        <div class="result-hint">بالدولار باستخدام الرافعة المحددة</div>
-      </div>
+            <div class="results-grid">
+              <div class="result-box">
+                <div class="result-label">حجم اللوت المقترح</div>
+                <div class="result-value" id="lotSize">0.00</div>
+                <div class="result-hint">لوت قياسي/مصغر حسب نوع الأداة</div>
+              </div>
 
-      <div class="result-box">
-        <div class="result-label">حجم العقد الاسمي (وحدات)</div>
-        <div class="result-value" id="notional">0</div>
-        <div class="result-hint">تقريبًا، 1 لوت فوركس = 100,000 وحدة</div>
-      </div>
+              <div class="result-box">
+                <div class="result-label">المبلغ المعرض للمخاطرة (USD)</div>
+                <div class="result-value" id="riskAmount">0.00</div>
+                <div class="result-hint">الخسارة المتوقعة عند ضرب وقف الخسارة</div>
+              </div>
 
-      <div class="warning">
-        ملاحظة: الأرقام تقريبية تعليمية. التنفيذ الفعلي يختلف حسب الوسيط، نوع الحساب، السبريد والعمولات.
+              <div class="result-box">
+                <div class="result-label">عدد النقاط حتى وقف الخسارة</div>
+                <div class="result-value" id="pipDistance">0.0</div>
+                <div class="result-hint">محسوبة حسب قيمة النقطة للأداة</div>
+              </div>
+
+              <div class="result-box">
+                <div class="result-label">الهامش المطلوب تقريبًا</div>
+                <div class="result-value" id="marginRequired">0.00</div>
+                <div class="result-hint">بالدولار باستخدام الرافعة المحددة</div>
+              </div>
+
+              <div class="result-box">
+                <div class="result-label">حجم العقد الاسمي (Notional)</div>
+                <div class="result-value" id="notional">0</div>
+                <div class="result-hint">وحدات تقريبية للعقد (Contract Size)</div>
+              </div>
+
+              <div class="result-box">
+                <div class="result-label">نسبة المخاطرة الفعلية من الرصيد</div>
+                <div class="result-value" id="riskPctReal">0.00%</div>
+                <div class="result-hint">تتحقق من أن النسبة مطابقة للمدخل</div>
+              </div>
+            </div>
+
+            <div class="warning">
+              ملاحظة مهمة: الحاسبة تقريبية تعليمية. القيم الفعلية تختلف حسب شركة الوساطة،
+              نوع الحساب، السبريد والعمولات، وقيمة النقطة لكل أداة.
+            </div>
+          </div>
+
+          <div id="noResults" style="font-size:12px; opacity:0.7; margin-top:8px;">
+            أدخل بيانات الصفقة واضغط "احسب حجم اللوت" لعرض نتائج إدارة المخاطر.
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // إعدادات حسب مجموعة الأداة
+    // إعدادات لكل مجموعة أدوات (تقريبية)
     const groupConfig = {
       major: {
-        pipSize: 0.0001,
-        pipValuePerLot: 10,    // تقريبًا 10$ للنقطة
+        pipSize: 0.0001,       // 1 نقطة
+        pipValuePerLot: 10,    // 10$ لكل نقطة للوت قياسي
         contractSize: 100000
       },
       jpy: {
@@ -476,10 +600,20 @@
         pipValuePerLot: 9.5,   // تقريبي
         contractSize: 100000
       },
-      gold: {
-        pipSize: 0.1,          // حركة 0.1 في الذهب
+      cross: {
+        pipSize: 0.0001,
+        pipValuePerLot: 9,     // أقل قليلًا من الميجور
+        contractSize: 100000
+      },
+      metals: {
+        pipSize: 0.1,          // 0.1 دولار
         pipValuePerLot: 10,
         contractSize: 100
+      },
+      oil: {
+        pipSize: 0.01,         // 0.01 للنفط
+        pipValuePerLot: 10,    // تقريبي
+        contractSize: 1000
       },
       indices: {
         pipSize: 1,            // نقطة واحدة في المؤشر
@@ -489,60 +623,78 @@
     };
 
     const form = document.getElementById("lotForm");
-    const resultsBox = document.getElementById("results");
+    const resultsWrapper = document.getElementById("results");
+    const noResults = document.getElementById("noResults");
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
 
       const balance = parseFloat(document.getElementById("balance").value);
-      const riskPercent = parseFloat(document.getElementById("risk").value);
+      const riskPercentInput = parseFloat(document.getElementById("risk").value);
       const entry = parseFloat(document.getElementById("entry").value);
       const sl = parseFloat(document.getElementById("sl").value);
       const leverage = parseFloat(document.getElementById("leverage").value || 1);
+
       const symbolSelect = document.getElementById("symbol");
-      const groupKey = symbolSelect.options[symbolSelect.selectedIndex].dataset.group || "major";
+      const symbol = symbolSelect.value;
+      const groupKey =
+        symbolSelect.options[symbolSelect.selectedIndex].dataset.group || "major";
 
       if (
         !isFinite(balance) ||
-        !isFinite(riskPercent) ||
+        !isFinite(riskPercentInput) ||
         !isFinite(entry) ||
         !isFinite(sl) ||
         balance <= 0 ||
-        riskPercent <= 0
+        riskPercentInput <= 0
       ) {
         alert("رجاءً تأكد من إدخال بيانات صحيحة في الحقول الأساسية.");
         return;
       }
 
       const config = groupConfig[groupKey];
+      if (!config) {
+        alert("لا يوجد إعدادات لهذه الأداة، تواصل مع المطور لإضافتها.");
+        return;
+      }
 
       const pipDistanceRaw = Math.abs(entry - sl);
       const pipDistance = pipDistanceRaw / config.pipSize;
 
       if (!isFinite(pipDistance) || pipDistance === 0) {
-        alert("مسافة الوقف صفر تقريبًا، عدّل سعر الدخول أو وقف الخسارة.");
+        alert("مسافة وقف الخسارة صفر تقريبًا، عدّل سعر الدخول أو وقف الخسارة.");
         return;
       }
 
-      const riskAmount = balance * (riskPercent / 100);
+      const riskAmount = balance * (riskPercentInput / 100);
       const lotSize = riskAmount / (pipDistance * config.pipValuePerLot);
 
       const notional = lotSize * config.contractSize;
       const marginRequired = leverage > 0 ? notional / leverage : 0;
 
+      // التأكد من النسبة الفعلية
+      const riskPctReal = (riskAmount / balance) * 100;
+
       document.getElementById("lotSize").textContent = lotSize.toFixed(2);
       document.getElementById("riskAmount").textContent = riskAmount.toFixed(2);
       document.getElementById("pipDistance").textContent = pipDistance.toFixed(1);
-      document.getElementById("marginRequired").textContent = marginRequired.toFixed(2);
+      document.getElementById("marginRequired").textContent =
+        marginRequired.toFixed(2);
       document.getElementById("notional").textContent =
         Math.round(notional).toLocaleString("en-US");
+      document.getElementById("riskPctReal").textContent =
+        riskPctReal.toFixed(2) + "%";
+      document.getElementById("currentSymbol").textContent = symbol;
 
-      resultsBox.style.display = "grid";
+      resultsWrapper.style.display = "flex";
+      noResults.style.display = "none";
     });
 
     document.getElementById("resetBtn").addEventListener("click", function () {
       form.reset();
-      resultsBox.style.display = "none";
+      resultsWrapper.style.display = "none";
+      noResults.style.display = "block";
+      document.getElementById("currentSymbol").textContent = "—";
     });
   </script>
 </body>
