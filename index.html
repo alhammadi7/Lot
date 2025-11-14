@@ -7,20 +7,20 @@
   <style>
     :root {
       --bg-main: #050712;
-      --bg-main-light: #f4f6fb;
+      --bg-main-light: #e7ecff;
       --card-bg: rgba(11, 14, 32, 0.96);
-      --card-bg-light: #ffffff;
+      --card-bg-light: #f9fbff;
       --accent: #00e0ff;
       --accent-2: #ff6b3d;
       --accent-soft: rgba(0, 224, 255, 0.14);
       --text-main: #f5f6ff;
-      --text-main-light: #101321;
+      --text-main-light: #111426;
       --text-muted: #a7afc7;
-      --text-muted-light: #66708e;
+      --text-muted-light: #525c7a;
       --border-soft: rgba(119, 135, 210, 0.4);
-      --border-soft-light: #dde2f3;
+      --border-soft-light: #c2caea;
       --shadow-strong: 0 18px 40px rgba(3, 6, 20, 0.92);
-      --shadow-strong-light: 0 16px 36px rgba(35, 46, 90, 0.18);
+      --shadow-strong-light: 0 16px 36px rgba(35, 46, 90, 0.2);
       --error-bg: rgba(255, 71, 87, 0.12);
       --error-text: #ff4b5c;
     }
@@ -42,7 +42,7 @@
     }
 
     body.light {
-      background: radial-gradient(circle at top, #fefeff 0, #e7ebff 40%, #cfd5f2 100%);
+      background: radial-gradient(circle at top, #fefeff 0, var(--bg-main-light) 40%, #cfd5f2 100%);
       color: var(--text-main-light);
     }
 
@@ -93,7 +93,7 @@
     }
 
     body.light .bg-wave {
-      opacity: 0.22;
+      opacity: 0.25;
       filter: blur(2px);
     }
 
@@ -254,8 +254,8 @@
 
     body.light .theme-toggle,
     body.light .lang-toggle {
-      background: #f4f6ff;
-      border-color: #cdd4f0;
+      background: #eef1ff;
+      border-color: #cbd4ff;
       color: var(--text-muted-light);
     }
 
@@ -311,9 +311,9 @@
     }
 
     body.light .badge.secondary {
-      background: #f0f3ff;
+      background: #e6ebff;
       color: var(--text-muted-light);
-      border-color: #d1d7f1;
+      border-color: var(--border-soft-light);
     }
 
     h1 {
@@ -391,12 +391,12 @@
 
     body.light input,
     body.light select {
-      background: #f6f7ff;
+      background: #f3f5ff;
       border-color: var(--border-soft-light);
       color: var(--text-main-light);
     }
 
-    body.light input::placeholder { color: #99a3c2; }
+    body.light input::placeholder { color: #8d95b2; }
 
     select { padding-right: 30px; }
 
@@ -449,7 +449,7 @@
 
     body.light button.secondary {
       background: #eef1ff;
-      border-color: #cdd5ff;
+      border-color: #cbd4ff;
       color: var(--text-muted-light);
     }
 
@@ -465,8 +465,8 @@
     }
 
     body.light .result {
-      background: #f5f6ff;
-      border-color: #c5cdf5;
+      background: #f2f4ff;
+      border-color: #b8c2f0;
       color: var(--text-main-light);
     }
 
@@ -506,7 +506,7 @@
     }
 
     body.light .pill {
-      background: #edf0ff;
+      background: #e8ecff;
       border-color: #cbd4ff;
       color: var(--text-muted-light);
     }
@@ -523,7 +523,7 @@
     }
 
     body.light .history-card {
-      background: #f7f8ff;
+      background: #f5f6ff;
       border-color: #c9d1f4;
     }
 
@@ -549,9 +549,10 @@
       top: 0;
       background: rgba(8, 11, 29, 0.96);
       z-index: 1;
+      color: #f5f6ff;
     }
 
-    body.light th { background: #edf0ff; }
+    body.light th { background: #e7ebff; color: #161a33; }
 
     .no-trades {
       text-align: center;
@@ -582,13 +583,15 @@
     }
 
     body.light .direction-buy {
-      background: rgba(76, 175, 80, 0.08);
+      background: rgba(76, 175, 80, 0.12);
       color: #2e7d32;
+      border-color: #5fbf6a;
     }
 
     body.light .direction-sell {
-      background: rgba(244, 67, 54, 0.08);
+      background: rgba(244, 67, 54, 0.12);
       color: #c62828;
+      border-color: #f0625f;
     }
 
     @media (max-width: 480px) {
@@ -717,7 +720,7 @@
               type="number"
               id="tp1"
               step="0.00001"
-              placeholder="اختياري (يُملأ تلقائياً)"
+              placeholder="اختياري (يحسَب تلقائياً)"
             />
           </div>
         </div>
@@ -728,7 +731,7 @@
               type="number"
               id="tp2"
               step="0.00001"
-              placeholder="اختياري (يُملأ تلقائياً)"
+              placeholder="اختياري (يحسَب تلقائياً)"
             />
           </div>
         </div>
@@ -742,7 +745,7 @@
               type="number"
               id="tp3"
               step="0.00001"
-              placeholder="اختياري (يُملأ تلقائياً)"
+              placeholder="اختياري (يحسَب تلقائياً)"
             />
           </div>
         </div>
@@ -890,6 +893,16 @@
       }
     }
 
+    // أقل حجم لوت نستخدمه عند حساب SL تلقائياً
+    function getMinLot(type) {
+      switch (type) {
+        case "INDEX":
+          return 0.1;
+        default:
+          return 0.01;
+      }
+    }
+
     function applyFundingPreset() {
       const plan = document.getElementById("fundingPlan").value;
       const fundingSize = document.getElementById("fundingSize");
@@ -974,30 +987,16 @@
 
       const pipValuePerLot = contractSize * pipSize;
       const riskAmount = balance * (riskPercent / 100);
+      const isBuy = side === "buy";
 
       let stopLossPips;
       let lotSize;
       let pipValueActual;
       let priceDelta;
 
-      const isBuy = side === "buy";
-
-      // لو SL فارغ => نحسبه تلقائي باستخدام أكبر لوت ممكن من الهامش
+      // إذا SL فاضي نحسبه من المخاطرة واللوت الأدنى (0.01 أو 0.1 للمؤشرات)
       if (isNaN(slPrice)) {
-        const maxNotional = balance * leverage;
-        const notionalPerLot = contractSize * entryPrice;
-        lotSize = maxNotional / notionalPerLot;
-
-        if (!isFinite(lotSize) || lotSize <= 0) {
-          resultBox.style.display = "block";
-          resultBox.classList.add("error");
-          resultBox.innerHTML =
-            currentLang === "ar"
-              ? "تعذر حساب حجم اللوت تلقائياً من الرصيد والرافعة. تحقق من المدخلات."
-              : "Failed to compute auto lot size from balance and leverage.";
-          return;
-        }
-
+        lotSize = getMinLot(instrumentType);
         pipValueActual = pipValuePerLot * lotSize;
         stopLossPips = riskAmount / pipValueActual;
         priceDelta = stopLossPips * pipSize;
@@ -1008,7 +1007,7 @@
 
         document.getElementById("slPrice").value = slPrice.toFixed(priceDecimals);
       } else {
-        // SL موجود => نحسب اللوت بناءً على مسافة الوقف
+        // SL موجود: نحسب اللوت من المسافة
         stopLossPips = Math.abs(entryPrice - slPrice) / pipSize;
 
         if (stopLossPips <= 0) {
@@ -1022,23 +1021,16 @@
         }
 
         lotSize = riskAmount / (stopLossPips * pipValuePerLot);
-
-        // تأكد أن اللوت لا يتجاوز أقصى ما يسمح به الهامش
-        const maxNotional = balance * leverage;
-        const notionalPerLot = contractSize * entryPrice;
-        const maxLot = maxNotional / notionalPerLot;
-        if (lotSize > maxLot) lotSize = maxLot;
-
         pipValueActual = pipValuePerLot * lotSize;
         priceDelta = stopLossPips * pipSize;
       }
 
-      // لو TP فاضية => نحسب TP1/2/3 بنظام R:R = 1/2/3
+      // لو TP فاضية => نحسبها بنظام R:R = 1:2, 1:3, 1:4 (أي 2x, 3x, 4x)
       if (isNaN(tp1) && isNaN(tp2) && isNaN(tp3)) {
         const sign = isBuy ? 1 : -1;
-        const newTp1 = entryPrice + sign * priceDelta * 1;
-        const newTp2 = entryPrice + sign * priceDelta * 2;
-        const newTp3 = entryPrice + sign * priceDelta * 3;
+        const newTp1 = entryPrice + sign * priceDelta * 2; // 1:2
+        const newTp2 = entryPrice + sign * priceDelta * 3; // 1:3
+        const newTp3 = entryPrice + sign * priceDelta * 4; // 1:4
 
         tp1 = newTp1;
         tp2 = newTp2;
@@ -1137,24 +1129,24 @@
         if (currentLang === "ar") {
           rrText += "<br><br><b>تحليل R:R للأهداف:</b><br>";
           if (rr1) {
-            rrText += "الهدف 1 (TP1): R:R ≈ " + formatNumber(rr1, 2) + "<br>";
+            rrText += "الهدف 1 (TP1): R:R ≈ " + formatNumber(rr1, 2) + " (مفروض قريب من 1:2)<br>";
           }
           if (rr2) {
-            rrText += "الهدف 2 (TP2): R:R ≈ " + formatNumber(rr2, 2) + "<br>";
+            rrText += "الهدف 2 (TP2): R:R ≈ " + formatNumber(rr2, 2) + " (قريب من 1:3)<br>";
           }
           if (rr3) {
-            rrText += "الهدف 3 (TP3): R:R ≈ " + formatNumber(rr3, 2) + "<br>";
+            rrText += "الهدف 3 (TP3): R:R ≈ " + formatNumber(rr3, 2) + " (قريب من 1:4)<br>";
           }
         } else {
           rrText += "<br><br><b>R:R analysis for targets:</b><br>";
           if (rr1) {
-            rrText += "Target 1 (TP1): R:R ≈ " + formatNumber(rr1, 2) + "<br>";
+            rrText += "Target 1 (TP1): R:R ≈ " + formatNumber(rr1, 2) + " (near 1:2)<br>";
           }
           if (rr2) {
-            rrText += "Target 2 (TP2): R:R ≈ " + formatNumber(rr2, 2) + "<br>";
+            rrText += "Target 2 (TP2): R:R ≈ " + formatNumber(rr2, 2) + " (near 1:3)<br>";
           }
           if (rr3) {
-            rrText += "Target 3 (TP3): R:R ≈ " + formatNumber(rr3, 2) + "<br>";
+            rrText += "Target 3 (TP3): R:R ≈ " + formatNumber(rr3, 2) + " (near 1:4)<br>";
           }
         }
       }
@@ -1173,7 +1165,7 @@
           "سعر وقف الخسارة المحسوب: <b>" +
           slPrice.toFixed(priceDecimals) +
           "</b><br>" +
-          "الأهداف: TP1 = <b>" + tp1.toFixed(priceDecimals) +
+          "الأهداف (بنظام 1:2 / 1:3 / 1:4): TP1 = <b>" + tp1.toFixed(priceDecimals) +
           "</b> • TP2 = <b>" + tp2.toFixed(priceDecimals) +
           "</b> • TP3 = <b>" + tp3.toFixed(priceDecimals) + "</b><br>" +
           "المبلغ المعرض للخسارة: <b>" +
@@ -1201,7 +1193,7 @@
           "Computed stop-loss price: <b>" +
           slPrice.toFixed(priceDecimals) +
           "</b><br>" +
-          "Targets: TP1 = <b>" + tp1.toFixed(priceDecimals) +
+          "Targets (1:2 / 1:3 / 1:4): TP1 = <b>" + tp1.toFixed(priceDecimals) +
           "</b> • TP2 = <b>" + tp2.toFixed(priceDecimals) +
           "</b> • TP3 = <b>" + tp3.toFixed(priceDecimals) + "</b><br>" +
           "Risk amount: <b>" +
@@ -1469,9 +1461,9 @@
       document.getElementById("slPrice").placeholder = isAr
         ? "اتركه فارغ للحساب تلقائياً"
         : "Leave empty for auto SL";
-      document.getElementById("tp1").placeholder = isAr ? "اختياري (يُملأ تلقائياً)" : "Optional (auto)";
-      document.getElementById("tp2").placeholder = isAr ? "اختياري (يُملأ تلقائياً)" : "Optional (auto)";
-      document.getElementById("tp3").placeholder = isAr ? "اختياري (يُملأ تلقائياً)" : "Optional (auto)";
+      document.getElementById("tp1").placeholder = isAr ? "اختياري (يحسَب تلقائياً)" : "Optional (auto)";
+      document.getElementById("tp2").placeholder = isAr ? "اختياري (يحسَب تلقائياً)" : "Optional (auto)";
+      document.getElementById("tp3").placeholder = isAr ? "اختياري (يحسَب تلقائياً)" : "Optional (auto)";
       document.getElementById("leverage").placeholder = isAr ? "مثال: 100 أو 500" : "Ex: 100 or 500";
       document.getElementById("fundingSize").placeholder = isAr ? "مثال: 100000" : "Ex: 100000";
       document.getElementById("dailyLossPct").placeholder = isAr ? "مثال شائع: 5" : "Common: 5";
