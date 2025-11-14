@@ -55,7 +55,6 @@
       gap: 12px;
     }
 
-    /* LOGO شموع يابانية */
     .logo-candles {
       width: 52px;
       height: 52px;
@@ -186,18 +185,11 @@
     }
 
     .layout {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
+      display: flex;
+      flex-direction: column;
       gap: 18px;
     }
 
-    @media (max-width: 850px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* FORM PANEL */
     .panel {
       border-radius: 18px;
       background: radial-gradient(circle at top left, #181e35, #050613 60%);
@@ -326,7 +318,6 @@
       transform: translateY(-1px);
     }
 
-    /* RESULTS PANEL */
     .results-panel {
       border-radius: 18px;
       background: radial-gradient(circle at top left, #14192b, #050612 60%);
@@ -339,12 +330,18 @@
 
     .results-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       font-size: 12px;
     }
 
-    @media (max-width: 500px) {
+    @media (max-width: 850px) {
+      .results-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 550px) {
       .results-grid {
         grid-template-columns: 1fr;
       }
@@ -424,12 +421,12 @@
 
       <h2>حاسبة اللوت المتقدمة</h2>
       <div class="subtitle">
-        حدد رصيد الحساب، نسبة المخاطرة، وسعر الدخول/الوقف – والأداة – وسيتم حساب حجم اللوت،
-        قيمة المخاطرة والهامش المطلوب بشكل آلي.
+        حدد رصيد الحساب، نسبة المخاطرة، وسعر الدخول/الوقف والأداة – وسيتم حساب حجم اللوت،
+        قيمة المخاطرة والهامش المطلوب والأهداف تلقائيًا.
       </div>
 
       <div class="layout">
-        <!-- FORM SIDE -->
+        <!-- FORM -->
         <div class="panel">
           <div class="panel-title">
             إعدادات الصفقة
@@ -456,8 +453,8 @@
 
             <div class="field">
               <label for="sl">سعر وقف الخسارة (SL)</label>
-              <span class="example">ضع سعر وقف الخسارة الفعلي للصفقة</span>
-              <input id="sl" type="number" step="0.00001" placeholder="1.08300" required />
+              <span class="example">يمكن تركه فارغ ليتم حسابه من مسافة الوقف</span>
+              <input id="sl" type="number" step="0.00001" placeholder="153.999" />
             </div>
 
             <div class="field full-row">
@@ -491,18 +488,35 @@
             </div>
 
             <div class="field">
-              <label for="tp1">هدف 1 (TP1) – اختياري</label>
-              <span class="example">للمتابعة فقط – لا يدخل في الحساب</span>
+              <label for="direction">نوع الصفقة</label>
+              <span class="example">مهم لحساب الأهداف ووقف الخسارة تلقائيًا</span>
+              <select id="direction">
+                <option value="buy">شراء (Buy)</option>
+                <option value="sell">بيع (Sell)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="stopPips">مسافة الوقف (بالنقاط)</label>
+              <span class="example">إذا كان حقل SL فارغًا سيُحسب من هذه المسافة</span>
+              <input id="stopPips" type="number" step="0.1" placeholder="20" />
+            </div>
+
+            <div class="field">
+              <label for="tp1">هدف 1 (TP1)</label>
+              <span class="example">يُحسب تلقائيًا = ضعفين الخسارة</span>
               <input id="tp1" type="number" step="0.00001" placeholder="—" />
             </div>
 
             <div class="field">
-              <label for="tp2">هدف 2 (TP2) – اختياري</label>
+              <label for="tp2">هدف 2 (TP2)</label>
+              <span class="example">3 أضعاف الخسارة</span>
               <input id="tp2" type="number" step="0.00001" placeholder="—" />
             </div>
 
             <div class="field">
-              <label for="tp3">هدف 3 (TP3) – اختياري</label>
+              <label for="tp3">هدف 3 (TP3)</label>
+              <span class="example">4 أضعاف الخسارة</span>
               <input id="tp3" type="number" step="0.00001" placeholder="—" />
             </div>
 
@@ -523,7 +537,7 @@
           </form>
         </div>
 
-        <!-- RESULTS SIDE -->
+        <!-- RESULTS UNDER FORM -->
         <div class="results-panel">
           <div class="panel-title">
             مخرجات الحاسبة
@@ -555,9 +569,9 @@
               </div>
 
               <div class="result-box">
-                <div class="result-label">الهامش المطلوب تقريبًا</div>
+                <div class="result-label">الهامش المستخدم تقريبًا</div>
                 <div class="result-value" id="marginRequired">0.00</div>
-                <div class="result-hint">بالدولار باستخدام الرافعة المحددة</div>
+                <div class="result-hint">بالدولار باستخدام الرافعة المحددة (Notional / Leverage)</div>
               </div>
 
               <div class="result-box">
@@ -569,18 +583,20 @@
               <div class="result-box">
                 <div class="result-label">نسبة المخاطرة الفعلية من الرصيد</div>
                 <div class="result-value" id="riskPctReal">0.00%</div>
-                <div class="result-hint">تتحقق من أن النسبة مطابقة للمدخل</div>
+                <div class="result-hint">للتأكد أن الحساب مطابق لنسبة المخاطرة المدخلة</div>
               </div>
             </div>
 
             <div class="warning">
               ملاحظة مهمة: الحاسبة تقريبية تعليمية. القيم الفعلية تختلف حسب شركة الوساطة،
-              نوع الحساب، السبريد والعمولات، وقيمة النقطة لكل أداة.
+              نوع الحساب، السبريد والعمولات، وقيمة النقطة لكل أداة.  
+              طبيعي في إدارة المخاطر أن يتناقص الهامش عندما توسّع وقف الخسارة لأن حجم اللوت
+              يقل للحفاظ على نفس نسبة المخاطرة من الرصيد.
             </div>
           </div>
 
           <div id="noResults" style="font-size:12px; opacity:0.7; margin-top:8px;">
-            أدخل بيانات الصفقة واضغط "احسب حجم اللوت" لعرض نتائج إدارة المخاطر.
+            أدخل بيانات الصفقة واضغط "احسب حجم اللوت" لعرض النتائج والأهداف.
           </div>
         </div>
       </div>
@@ -588,39 +604,48 @@
   </div>
 
   <script>
-    // إعدادات لكل مجموعة أدوات (تقريبية)
     const groupConfig = {
       major: {
-        pipSize: 0.0001,       // 1 نقطة
-        pipValuePerLot: 10,    // 10$ لكل نقطة للوت قياسي
+        pipSize: 0.0001,
+        pipValuePerLot: 10,
         contractSize: 100000
       },
       jpy: {
-        pipSize: 0.01,         // أزواج الين النقطة الثانية
-        pipValuePerLot: 9.5,   // تقريبي
+        pipSize: 0.01,
+        pipValuePerLot: 9.5,
         contractSize: 100000
       },
       cross: {
         pipSize: 0.0001,
-        pipValuePerLot: 9,     // أقل قليلًا من الميجور
+        pipValuePerLot: 9,
         contractSize: 100000
       },
       metals: {
-        pipSize: 0.1,          // 0.1 دولار
+        pipSize: 0.1,
         pipValuePerLot: 10,
         contractSize: 100
       },
       oil: {
-        pipSize: 0.01,         // 0.01 للنفط
-        pipValuePerLot: 10,    // تقريبي
+        pipSize: 0.01,
+        pipValuePerLot: 10,
         contractSize: 1000
       },
       indices: {
-        pipSize: 1,            // نقطة واحدة في المؤشر
-        pipValuePerLot: 1,     // 1$ لكل نقطة – افتراض
+        pipSize: 1,
+        pipValuePerLot: 1,
         contractSize: 1
       }
     };
+
+    function decimalsFromPip(pipSize) {
+      let d = 0;
+      let v = pipSize;
+      while (v < 1 && d < 8) {
+        v *= 10;
+        d++;
+      }
+      return d;
+    }
 
     const form = document.getElementById("lotForm");
     const resultsWrapper = document.getElementById("results");
@@ -632,7 +657,6 @@
       const balance = parseFloat(document.getElementById("balance").value);
       const riskPercentInput = parseFloat(document.getElementById("risk").value);
       const entry = parseFloat(document.getElementById("entry").value);
-      const sl = parseFloat(document.getElementById("sl").value);
       const leverage = parseFloat(document.getElementById("leverage").value || 1);
 
       const symbolSelect = document.getElementById("symbol");
@@ -640,11 +664,14 @@
       const groupKey =
         symbolSelect.options[symbolSelect.selectedIndex].dataset.group || "major";
 
+      const direction = document.getElementById("direction").value;
+      const stopPips = parseFloat(document.getElementById("stopPips").value);
+      const slInput = document.getElementById("sl");
+
       if (
         !isFinite(balance) ||
         !isFinite(riskPercentInput) ||
         !isFinite(entry) ||
-        !isFinite(sl) ||
         balance <= 0 ||
         riskPercentInput <= 0
       ) {
@@ -656,6 +683,23 @@
       if (!config) {
         alert("لا يوجد إعدادات لهذه الأداة، تواصل مع المطور لإضافتها.");
         return;
+      }
+
+      let sl = parseFloat(slInput.value);
+
+      if (!isFinite(sl)) {
+        if (!isFinite(stopPips) || stopPips <= 0) {
+          alert("إما أدخل وقف الخسارة يدويًا أو حدد مسافة الوقف بالنقاط للحساب التلقائي.");
+          return;
+        }
+        const priceDistanceAuto = stopPips * config.pipSize;
+        if (direction === "buy") {
+          sl = entry - priceDistanceAuto;
+        } else {
+          sl = entry + priceDistanceAuto;
+        }
+        const dec = decimalsFromPip(config.pipSize);
+        slInput.value = sl.toFixed(dec);
       }
 
       const pipDistanceRaw = Math.abs(entry - sl);
@@ -671,9 +715,24 @@
 
       const notional = lotSize * config.contractSize;
       const marginRequired = leverage > 0 ? notional / leverage : 0;
-
-      // التأكد من النسبة الفعلية
       const riskPctReal = (riskAmount / balance) * 100;
+
+      // حساب الأهداف تلقائيًا: 2x, 3x, 4x مسافة الخسارة
+      const priceRisk = Math.abs(entry - sl);
+      const dec = decimalsFromPip(config.pipSize);
+      let tp1, tp2, tp3;
+      if (direction === "buy") {
+        tp1 = entry + 2 * priceRisk;
+        tp2 = entry + 3 * priceRisk;
+        tp3 = entry + 4 * priceRisk;
+      } else {
+        tp1 = entry - 2 * priceRisk;
+        tp2 = entry - 3 * priceRisk;
+        tp3 = entry - 4 * priceRisk;
+      }
+      document.getElementById("tp1").value = tp1.toFixed(dec);
+      document.getElementById("tp2").value = tp2.toFixed(dec);
+      document.getElementById("tp3").value = tp3.toFixed(dec);
 
       document.getElementById("lotSize").textContent = lotSize.toFixed(2);
       document.getElementById("riskAmount").textContent = riskAmount.toFixed(2);
@@ -686,7 +745,7 @@
         riskPctReal.toFixed(2) + "%";
       document.getElementById("currentSymbol").textContent = symbol;
 
-      resultsWrapper.style.display = "flex";
+      resultsWrapper.style.display = "block";
       noResults.style.display = "none";
     });
 
