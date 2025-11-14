@@ -559,7 +559,6 @@
       color: var(--text-muted);
     }
 
-    /* خانة اتجاه الصفقة (Buy / Sell) */
     .direction-tag {
       display: inline-flex;
       align-items: center;
@@ -690,10 +689,24 @@
               type="number"
               id="slPrice"
               step="0.00001"
-              placeholder="مثال: 1.08300"
+              placeholder="اتركه فارغ للحساب تلقائياً"
             />
           </div>
         </div>
+      </div>
+
+      <div class="row-2">
+        <div>
+          <label id="lbl_side">نوع الصفقة:</label>
+          <div class="input-wrapper">
+            <select id="side">
+              <option value="buy">شراء (Long)</option>
+              <option value="sell">بيع (Short)</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+        <div></div>
       </div>
 
       <div class="row-2">
@@ -921,6 +934,7 @@
       const leverage = parseFloat(document.getElementById("leverage").value);
       const instrumentType =
         document.getElementById("instrumentType").value;
+      const side = document.getElementById("side").value; // buy / sell
 
       const fundingSize = parseFloat(
         document.getElementById("fundingSize").value
@@ -938,15 +952,14 @@
         isNaN(balance) ||
         isNaN(riskPercent) ||
         isNaN(entryPrice) ||
-        isNaN(slPrice) ||
         isNaN(leverage)
       ) {
         resultBox.style.display = "block";
         resultBox.classList.add("error");
         resultBox.innerHTML =
           currentLang === "ar"
-            ? "رجاءً تأكد من تعبئة رصيد الحساب، نسبة المخاطرة، سعر الدخول، وقف الخسارة، والرافعة."
-            : "Please fill balance, risk %, entry price, stop loss and leverage correctly.";
+            ? "رجاءً تأكد من تعبئة رصيد الحساب، نسبة المخاطرة، سعر الدخول، والرافعة."
+            : "Please fill balance, risk %, entry price and leverage correctly.";
         return;
       }
 
@@ -954,35 +967,75 @@
       const contractSize = params.contractSize;
       const pipSize = params.pipSize;
 
-      // عدد المنازل السعرية لعرض SL/TP
       let priceDecimals = 2;
       if (pipSize === 0.0001) priceDecimals = 5;
       else if (pipSize === 0.01) priceDecimals = 3;
       else if (pipSize === 0.1) priceDecimals = 2;
 
-      let stopLossPips = Math.abs(entryPrice - slPrice) / pipSize;
+      const pipValuePerLot = contractSize * pipSize;
+      const riskAmount = balance * (riskPercent / 100);
 
-      if (stopLossPips <= 0) {
-        resultBox.style.display = "block";
-        resultBox.classList.add("error");
-        resultBox.innerHTML =
-          currentLang === "ar"
-            ? "سعر الدخول ووقف الخسارة متساويان أو الفرق صفر. عدّل القيم أولاً."
-            : "Entry price and stop loss are equal or difference is zero. Adjust them first.";
-        return;
+      let stopLossPips;
+      let lotSize;
+      let pipValueActual;
+      let priceDelta;
+
+      const isBuy = side === "buy";
+
+      // لو SL فارغ => نحسبه تلقائي باستخدام أكبر لوت ممكن من الهامش
+      if (isNaN(slPrice)) {
+        const maxNotional = balance * leverage;
+        const notionalPerLot = contractSize * entryPrice;
+        lotSize = maxNotional / notionalPerLot;
+
+        if (!isFinite(lotSize) || lotSize <= 0) {
+          resultBox.style.display = "block";
+          resultBox.classList.add("error");
+          resultBox.innerHTML =
+            currentLang === "ar"
+              ? "تعذر حساب حجم اللوت تلقائياً من الرصيد والرافعة. تحقق من المدخلات."
+              : "Failed to compute auto lot size from balance and leverage.";
+          return;
+        }
+
+        pipValueActual = pipValuePerLot * lotSize;
+        stopLossPips = riskAmount / pipValueActual;
+        priceDelta = stopLossPips * pipSize;
+
+        slPrice = isBuy
+          ? entryPrice - priceDelta
+          : entryPrice + priceDelta;
+
+        document.getElementById("slPrice").value = slPrice.toFixed(priceDecimals);
+      } else {
+        // SL موجود => نحسب اللوت بناءً على مسافة الوقف
+        stopLossPips = Math.abs(entryPrice - slPrice) / pipSize;
+
+        if (stopLossPips <= 0) {
+          resultBox.style.display = "block";
+          resultBox.classList.add("error");
+          resultBox.innerHTML =
+            currentLang === "ar"
+              ? "سعر الدخول ووقف الخسارة متساويان أو الفرق صفر. عدّل القيم أولاً."
+              : "Entry price and stop loss are equal or difference is zero.";
+          return;
+        }
+
+        lotSize = riskAmount / (stopLossPips * pipValuePerLot);
+
+        // تأكد أن اللوت لا يتجاوز أقصى ما يسمح به الهامش
+        const maxNotional = balance * leverage;
+        const notionalPerLot = contractSize * entryPrice;
+        const maxLot = maxNotional / notionalPerLot;
+        if (lotSize > maxLot) lotSize = maxLot;
+
+        pipValueActual = pipValuePerLot * lotSize;
+        priceDelta = stopLossPips * pipSize;
       }
 
-      // اتجاه الصفقة من علاقة SL بـ Entry
-      let direction = entryPrice < slPrice
-        ? (currentLang === "ar" ? "بيع" : "Sell")
-        : (currentLang === "ar" ? "شراء" : "Buy");
-
-      // تعبئة TP1/2/3 تلقائياً إذا كانت فارغة (R:R = 1 / 2 / 3)
+      // لو TP فاضية => نحسب TP1/2/3 بنظام R:R = 1/2/3
       if (isNaN(tp1) && isNaN(tp2) && isNaN(tp3)) {
-        const priceDelta = Math.abs(entryPrice - slPrice); // قيمة المخاطرة بالسعر
-        const isBuy = (direction === "شراء" || direction === "Buy");
         const sign = isBuy ? 1 : -1;
-
         const newTp1 = entryPrice + sign * priceDelta * 1;
         const newTp2 = entryPrice + sign * priceDelta * 2;
         const newTp3 = entryPrice + sign * priceDelta * 3;
@@ -996,10 +1049,6 @@
         document.getElementById("tp3").value = newTp3.toFixed(priceDecimals);
       }
 
-      const pipValuePerLot = contractSize * pipSize;
-      const riskAmount = balance * (riskPercent / 100);
-      const lotSize = riskAmount / (stopLossPips * pipValuePerLot);
-      const pipValueActual = pipValuePerLot * lotSize;
       const positionNotional = contractSize * lotSize * entryPrice;
       const marginRequired = positionNotional / leverage;
 
@@ -1020,7 +1069,10 @@
         rr3 = profitPips3 / stopLossPips;
       }
 
-      // خانة الاتجاه مع سهم
+      const direction = isBuy
+        ? (currentLang === "ar" ? "شراء" : "Buy")
+        : (currentLang === "ar" ? "بيع" : "Sell");
+
       let dirHtml;
       if (currentLang === "ar") {
         if (direction === "شراء") {
@@ -1118,6 +1170,12 @@
           "عدد نقاط وقف الخسارة: <b>" +
           formatNumber(stopLossPips, 1) +
           " نقطة</b><br>" +
+          "سعر وقف الخسارة المحسوب: <b>" +
+          slPrice.toFixed(priceDecimals) +
+          "</b><br>" +
+          "الأهداف: TP1 = <b>" + tp1.toFixed(priceDecimals) +
+          "</b> • TP2 = <b>" + tp2.toFixed(priceDecimals) +
+          "</b> • TP3 = <b>" + tp3.toFixed(priceDecimals) + "</b><br>" +
           "المبلغ المعرض للخسارة: <b>" +
           formatNumber(riskAmount, 2) +
           "</b> من عملة الحساب<br>" +
@@ -1140,6 +1198,12 @@
           "Stop-loss distance: <b>" +
           formatNumber(stopLossPips, 1) +
           " pips</b><br>" +
+          "Computed stop-loss price: <b>" +
+          slPrice.toFixed(priceDecimals) +
+          "</b><br>" +
+          "Targets: TP1 = <b>" + tp1.toFixed(priceDecimals) +
+          "</b> • TP2 = <b>" + tp2.toFixed(priceDecimals) +
+          "</b> • TP3 = <b>" + tp3.toFixed(priceDecimals) + "</b><br>" +
           "Risk amount: <b>" +
           formatNumber(riskAmount, 2) +
           "</b> in account currency<br>" +
@@ -1321,6 +1385,10 @@
         ? "سعر وقف الخسارة (SL):"
         : "Stop loss price (SL):";
 
+      document.getElementById("lbl_side").textContent = isAr
+        ? "نوع الصفقة:"
+        : "Trade side:";
+
       document.getElementById("lbl_tp1").textContent = isAr
         ? "هدف 1 (TP1):"
         : "Target 1 (TP1):";
@@ -1398,7 +1466,9 @@
       document.getElementById("entryPrice").placeholder = isAr
         ? "مثال: 1.08500 أو 2350.0 للذهب"
         : "Ex: 1.08500 or 2350.0 for gold";
-      document.getElementById("slPrice").placeholder = isAr ? "مثال: 1.08300" : "Ex: 1.08300";
+      document.getElementById("slPrice").placeholder = isAr
+        ? "اتركه فارغ للحساب تلقائياً"
+        : "Leave empty for auto SL";
       document.getElementById("tp1").placeholder = isAr ? "اختياري (يُملأ تلقائياً)" : "Optional (auto)";
       document.getElementById("tp2").placeholder = isAr ? "اختياري (يُملأ تلقائياً)" : "Optional (auto)";
       document.getElementById("tp3").placeholder = isAr ? "اختياري (يُملأ تلقائياً)" : "Optional (auto)";
@@ -1437,6 +1507,15 @@
         fp[2].text = "100K";
         fp[3].text = "200K";
         fp[4].text = "Custom";
+      }
+
+      const sideOpts = document.getElementById("side").options;
+      if (isAr) {
+        sideOpts[0].text = "شراء (Long)";
+        sideOpts[1].text = "بيع (Short)";
+      } else {
+        sideOpts[0].text = "Buy (Long)";
+        sideOpts[1].text = "Sell (Short)";
       }
 
       const isLight = document.body.classList.contains("light");
