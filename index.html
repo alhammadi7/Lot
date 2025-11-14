@@ -2,1654 +2,462 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
+  <title>حاسبة اللوت المتقدمة</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Busultan Trading Lot Engine</title>
   <style>
-    :root {
-      --bg-main: #050712;
-      --bg-main-light: #f4f6fb;
-      --card-bg: rgba(11, 14, 32, 0.96);
-      --card-bg-light: #ffffff;
-      --accent: #00e0ff;
-      --accent-2: #ff6b3d;
-      --accent-soft: rgba(0, 224, 255, 0.14);
-      --text-main: #f5f6ff;
-      --text-main-light: #101321;
-      --text-muted: #a7afc7;
-      --text-muted-light: #66708e;
-      --border-soft: rgba(119, 135, 210, 0.4);
-      --border-soft-light: #dde2f3;
-      --shadow-strong: 0 18px 40px rgba(3, 6, 20, 0.92);
-      --shadow-strong-light: 0 16px 36px rgba(35, 46, 90, 0.18);
-      --error-bg: rgba(255, 71, 87, 0.12);
-      --error-text: #ff4b5c;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
+    }
+
+    body {
       min-height: 100vh;
+      background: radial-gradient(circle at top left, #1b2038, #050611 60%);
+      color: #f5f7ff;
       display: flex;
-      align-items: stretch;
       justify-content: center;
-      background: radial-gradient(circle at top, #191f40 0, #050712 50%, #000 100%);
-      color: var(--text-main);
-      transition: background 0.35s ease, color 0.35s ease;
-    }
-
-    body.light {
-      background: radial-gradient(circle at top, #fefeff 0, #e7ebff 40%, #cfd5f2 100%);
-      color: var(--text-main-light);
-    }
-
-    .background-fx {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    .bg-ring {
-      position: absolute;
-      width: 520px;
-      height: 520px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 224, 255, 0.18);
-      box-shadow: 0 0 45px rgba(0, 224, 255, 0.12);
-      top: -140px;
-      left: -120px;
-      filter: blur(0.3px);
-    }
-
-    .bg-ring:nth-child(2) {
-      top: auto;
-      bottom: -180px;
-      right: -160px;
-      left: auto;
-      border-color: rgba(255, 107, 61, 0.2);
-      box-shadow: 0 0 60px rgba(255, 107, 61, 0.18);
-    }
-
-    .bg-wave {
-      position: absolute;
-      inset: 38% -40% auto -40%;
-      height: 120px;
-      background: linear-gradient(
-        90deg,
-        rgba(0, 224, 255, 0.05) 0%,
-        rgba(0, 224, 255, 0.7) 35%,
-        rgba(255, 107, 61, 0.7) 65%,
-        rgba(255, 107, 61, 0.12) 100%
-      );
-      mix-blend-mode: screen;
-      opacity: 0.55;
-      transform: skewY(-7deg);
-      filter: blur(1.2px);
-    }
-
-    body.light .bg-wave {
-      opacity: 0.22;
-      filter: blur(2px);
-    }
-
-    .app-wrapper {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 620px;
-      padding: 18px 14px 26px;
+      align-items: flex-start;
+      padding: 40px 10px;
     }
 
     .card {
-      position: relative;
       width: 100%;
-      padding: 16px 18px 20px;
-      border-radius: 24px;
-      background: var(--card-bg);
-      border: 1px solid var(--border-soft);
-      box-shadow: var(--shadow-strong);
-      backdrop-filter: blur(22px);
-      transition: background 0.35s ease, border-color 0.35s ease,
-        box-shadow 0.35s ease;
+      max-width: 900px;
+      background: linear-gradient(135deg, #111522, #060712);
+      border-radius: 18px;
+      padding: 24px 22px 26px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    body.light .card {
-      background: var(--card-bg-light);
-      border-color: var(--border-soft-light);
-      box-shadow: var(--shadow-strong-light);
-    }
-
-    .header {
+    .card-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 10px;
-    }
-
-    .logo-block {
-      display: flex;
       align-items: center;
-      gap: 10px;
+      margin-bottom: 18px;
     }
 
-    .logo-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: radial-gradient(circle at 10% 0, #00e0ff 0, #050b1f 40%, #ff6b3d 100%);
-      position: relative;
-      box-shadow:
-        0 0 18px rgba(0, 224, 255, 0.6),
-        0 0 26px rgba(255, 107, 61, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .logo-mark::before {
-      content: "";
-      position: absolute;
-      width: 70%;
-      height: 2px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, transparent, #fff, transparent);
-      top: 12px;
-      opacity: 0.7;
-    }
-
-    .logo-chart {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 3px;
-      width: 26px;
-      height: 22px;
-    }
-
-    .logo-candle {
-      position: relative;
-      width: 5px;
-      border-radius: 999px;
-      background: linear-gradient(
-        to top,
-        rgba(0, 224, 255, 0.2),
-        rgba(0, 224, 255, 0.95)
-      );
-    }
-
-    .logo-candle::before {
-      content: "";
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1.5px;
-      top: -7px;
-      bottom: -4px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.9);
-      opacity: 0.85;
-    }
-
-    .logo-candle.down {
-      background: linear-gradient(
-        to top,
-        rgba(255, 107, 61, 0.2),
-        rgba(255, 107, 61, 0.95)
-      );
-    }
-
-    .logo-candle:nth-child(1) { height: 13px; }
-    .logo-candle:nth-child(2) { height: 18px; }
-    .logo-candle:nth-child(3) { height: 10px; }
-
-    .logo-text-main {
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      font-size: 16px;
-    }
-
-    .logo-text-sub {
-      font-size: 10px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-    }
-
-    body.light .logo-text-sub { color: var(--text-muted-light); }
-
-    .header-actions {
+    .brand {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      align-items: flex-end;
+      gap: 4px;
     }
 
-    @media (min-width: 420px) {
-      .header-actions {
-        flex-direction: row;
-        align-items: center;
-      }
+    .brand-title {
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      font-size: 18px;
     }
 
-    .theme-toggle,
-    .lang-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(121, 138, 210, 0.7);
-      background: radial-gradient(circle at top, #151a37 0, #060918 70%);
-      color: var(--text-muted);
+    .brand-sub {
       font-size: 11px;
-      cursor: pointer;
-    }
-
-    body.light .theme-toggle,
-    body.light .lang-toggle {
-      background: #f4f6ff;
-      border-color: #cdd4f0;
-      color: var(--text-muted-light);
-    }
-
-    .theme-toggle span.icon {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 0, #ffe066 0, #ff8a3d 45%, #c23dff 100%);
-      box-shadow: 0 0 10px rgba(255, 193, 7, 0.7);
-    }
-
-    body.light .theme-toggle span.icon {
-      background: radial-gradient(circle at 50% 50%, #1a2340 0, #344161 100%);
-      box-shadow: 0 0 7px rgba(40, 52, 90, 0.8);
-    }
-
-    .lang-toggle span.icon { font-size: 13px; }
-
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-      margin-bottom: 6px;
-      font-size: 10px;
+      opacity: 0.75;
     }
 
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 9px;
+      font-size: 10px;
+      padding: 3px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(0, 224, 255, 0.45);
-      background: rgba(0, 224, 255, 0.1);
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      background: rgba(255, 255, 255, 0.06);
+      margin-left: 6px;
     }
 
-    .badge-dot {
-      width: 7px;
-      height: 7px;
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      background: radial-gradient(circle, #00e0ff 0, transparent 60%);
-      box-shadow: 0 0 12px rgba(0, 224, 255, 0.9);
+      background: #ffb341;
+      box-shadow: 0 0 8px rgba(255, 179, 65, 0.8);
     }
 
-    .badge.secondary {
-      border-color: rgba(255, 255, 255, 0.22);
-      background: rgba(15, 21, 48, 0.9);
-      color: var(--text-muted);
-    }
-
-    body.light .badge.secondary {
-      background: #f0f3ff;
-      color: var(--text-muted-light);
-      border-color: #d1d7f1;
-    }
-
-    h1 {
-      font-size: 19px;
-      margin: 3px 0 2px;
+    h2 {
+      font-size: 17px;
+      margin-bottom: 6px;
+      text-align: center;
     }
 
     .subtitle {
-      margin: 0;
       font-size: 11px;
-      color: var(--text-muted);
+      text-align: center;
+      opacity: 0.8;
+      margin-bottom: 18px;
     }
 
-    body.light .subtitle { color: var(--text-muted-light); }
+    form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 20px;
+    }
 
-    .section-title {
-      margin: 10px 0 6px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
+    @media (max-width: 700px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field {
       display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    body.light .section-title { color: var(--text-muted-light); }
-
-    .section-title::before {
-      content: "";
-      width: 20px;
-      height: 1px;
-      border-radius: 999px;
-      background: linear-gradient(to left, var(--accent), transparent);
+      flex-direction: column;
+      gap: 5px;
+      font-size: 12px;
     }
 
     label {
-      display: block;
-      margin-top: 7px;
-      margin-bottom: 3px;
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-muted);
+      opacity: 0.9;
     }
 
-    body.light label { color: var(--text-muted-light); }
-
-    .row-2 {
-      display: flex;
-      gap: 8px;
-    }
-
-    .row-2 > div { flex: 1; }
-
-    .input-wrapper {
-      position: relative;
-      margin-bottom: 4px;
+    .example {
+      font-size: 10px;
+      opacity: 0.6;
     }
 
     input,
     select {
       width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(5, 6, 16, 0.9);
+      color: #f5f7ff;
       padding: 8px 10px;
-      border-radius: 11px;
-      border: 1px solid var(--border-soft);
-      background: rgba(4, 7, 23, 0.92);
-      color: var(--text-main);
-      font-size: 12px;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
-    }
-
-    input::placeholder { color: #60678d; }
-
-    body.light input,
-    body.light select {
-      background: #f6f7ff;
-      border-color: var(--border-soft-light);
-      color: var(--text-main-light);
-    }
-
-    body.light input::placeholder { color: #99a3c2; }
-
-    select { padding-right: 30px; }
-
-    .select-arrow {
-      position: absolute;
-      top: 50%;
-      inset-inline-end: 9px;
-      transform: translateY(-50%);
-      pointer-events: none;
-      font-size: 11px;
-      color: #8089b0;
-    }
-
-    body.light .select-arrow { color: #707aa6; }
-
-    button.primary {
-      margin-top: 10px;
-      padding: 9px;
-      width: 100%;
-      border-radius: 999px;
-      border: none;
-      font-weight: 600;
       font-size: 13px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #00e0ff, #ff6b3d);
-      color: #050712;
-      box-shadow:
-        0 10px 26px rgba(0, 224, 255, 0.25),
-        0 0 0 1px rgba(0, 0, 0, 0.35);
+      outline: none;
+      transition: border 0.18s ease, box-shadow 0.18s ease,
+        background 0.18s ease;
     }
 
-    button.primary:active {
-      transform: translateY(1px);
-      box-shadow:
-        0 3px 10px rgba(0, 224, 255, 0.2),
-        0 0 0 1px rgba(0, 0, 0, 0.35);
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.35);
     }
 
-    button.secondary {
-      margin-top: 7px;
-      padding: 7px;
-      width: 100%;
-      border-radius: 999px;
-      border: 1px solid rgba(121, 138, 210, 0.7);
-      background: rgba(9, 13, 33, 0.96);
-      color: var(--text-muted);
-      font-size: 11px;
+    input:focus,
+    select:focus {
+      border-color: #3f8cff;
+      box-shadow: 0 0 0 1px rgba(63, 140, 255, 0.5);
+      background: rgba(5, 9, 30, 0.95);
+    }
+
+    select {
       cursor: pointer;
     }
 
-    body.light button.secondary {
-      background: #eef1ff;
-      border-color: #cdd5ff;
-      color: var(--text-muted-light);
+    .full-row {
+      grid-column: 1 / -1;
     }
 
-    .result {
-      margin-top: 12px;
-      padding: 9px 10px;
-      border-radius: 14px;
-      background: radial-gradient(circle at top left, #18213f 0, #080b1d 55%);
-      border: 1px solid rgba(117, 132, 197, 0.65);
-      font-size: 12px;
-      line-height: 1.7;
-      color: var(--text-main);
-    }
-
-    body.light .result {
-      background: #f5f6ff;
-      border-color: #c5cdf5;
-      color: var(--text-main-light);
-    }
-
-    .result b { color: #ffffff; }
-    body.light .result b { color: #151728; }
-
-    .result.error {
-      background: var(--error-bg);
-      border-color: rgba(255, 75, 92, 0.7);
-      color: var(--error-text);
-    }
-
-    .note {
-      margin-top: 7px;
-      font-size: 10px;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    body.light .note { color: var(--text-muted-light); }
-
-    .pill-row {
+    .btn-row {
+      margin-top: 10px;
       display: flex;
+      gap: 10px;
+      justify-content: flex-start;
       flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 5px;
-      margin-bottom: 0;
     }
 
-    .pill {
-      padding: 2px 7px;
+    button {
+      border: none;
       border-radius: 999px;
-      border: 1px solid rgba(120, 135, 210, 0.5);
-      font-size: 9px;
-      color: var(--text-muted);
-      background: rgba(7, 12, 34, 0.94);
-    }
-
-    body.light .pill {
-      background: #edf0ff;
-      border-color: #cbd4ff;
-      color: var(--text-muted-light);
-    }
-
-    .history-card {
-      margin-top: 12px;
-      padding: 9px 10px;
-      border-radius: 16px;
-      background: rgba(6, 9, 24, 0.94);
-      border: 1px solid rgba(108, 123, 196, 0.7);
-      font-size: 11px;
-      max-height: 210px;
-      overflow: auto;
-    }
-
-    body.light .history-card {
-      background: #f7f8ff;
-      border-color: #c9d1f4;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 10px;
-    }
-
-    th,
-    td {
-      padding: 4px 3px;
-      border-bottom: 1px solid rgba(80, 94, 160, 0.5);
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    body.light th,
-    body.light td { border-bottom-color: #d5dcfb; }
-
-    th {
-      position: sticky;
-      top: 0;
-      background: rgba(8, 11, 29, 0.96);
-      z-index: 1;
-    }
-
-    body.light th { background: #edf0ff; }
-
-    .no-trades {
-      text-align: center;
-      padding: 5px 0;
-      color: var(--text-muted);
-    }
-
-    /* خانة اتجاه الصفقة (Buy / Sell) */
-    .direction-tag {
+      padding: 9px 18px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 2px 7px;
-      border-radius: 999px;
+      gap: 6px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        background 0.12s ease, opacity 0.12s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3f8cff, #945bff);
+      color: #ffffff;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.8);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.9);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.03);
+      color: #d3d7ff;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .results {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 700px) {
+      .results {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 500px) {
+      .results {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .result-box {
+      background: radial-gradient(circle at top left, #181c33, #070818);
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .result-label {
       font-size: 11px;
+      opacity: 0.65;
+      margin-bottom: 3px;
+    }
+
+    .result-value {
+      font-size: 15px;
       font-weight: 600;
     }
 
-    .direction-buy {
-      background: rgba(76, 175, 80, 0.12);
-      color: #8be58f;
-      border: 1px solid rgba(76, 175, 80, 0.7);
+    .result-hint {
+      font-size: 10px;
+      opacity: 0.55;
+      margin-top: 3px;
     }
 
-    .direction-sell {
-      background: rgba(244, 67, 54, 0.12);
-      color: #ff8b8b;
-      border: 1px solid rgba(244, 67, 54, 0.7);
-    }
-
-    body.light .direction-buy {
-      background: rgba(76, 175, 80, 0.08);
-      color: #2e7d32;
-    }
-
-    body.light .direction-sell {
-      background: rgba(244, 67, 54, 0.08);
-      color: #c62828;
-    }
-
-    @media (max-width: 480px) {
-      .card { padding-inline: 14px; }
-      .header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-      .header-actions { align-items: flex-start; }
+    .warning {
+      grid-column: 1 / -1;
+      font-size: 10px;
+      color: #ffb341;
+      opacity: 0.85;
     }
   </style>
 </head>
 <body>
-  <div class="background-fx">
-    <div class="bg-ring"></div>
-    <div class="bg-ring"></div>
-    <div class="bg-wave"></div>
-  </div>
-
-  <div class="app-wrapper">
-    <div class="card">
-      <div class="header">
-        <div>
-          <div class="logo-block">
-            <div class="logo-mark">
-              <div class="logo-chart" aria-hidden="true">
-                <span class="logo-candle up"></span>
-                <span class="logo-candle down"></span>
-                <span class="logo-candle up"></span>
-              </div>
-            </div>
-            <div>
-              <div id="logoTextMain" class="logo-text-main">Busultan Trading</div>
-              <div id="logoTextSub" class="logo-text-sub">PRO RISK ENGINE</div>
-            </div>
-          </div>
-          <div class="badge-row">
-            <div class="badge">
-              <span class="badge-dot"></span>
-              <span id="badgeMain">LOT ENGINE v2.0</span>
-            </div>
-            <div class="badge secondary">
-              <span id="badgeSecondary">Multi-Asset • Funding • R:R</span>
-            </div>
-          </div>
-          <h1 id="mainTitle">حاسبة اللوت المتقدمة</h1>
-          <p id="subtitle" class="subtitle">
-            إدارة مخاطرة احترافية: فوركس، ذهب، نفط، مؤشرات، وحسابات تمويل مع حفظ الصفقات.
-          </p>
-        </div>
-
-        <div class="header-actions">
-          <button class="theme-toggle" id="themeToggle" type="button">
-            <span class="icon"></span>
-            <span id="themeLabel">وضع ليلي</span>
-          </button>
-          <button class="lang-toggle" id="langToggle" type="button">
-            <span class="icon">🌐</span>
-            <span id="langLabel">AR</span>
-          </button>
+  <div class="card">
+    <div class="card-header">
+      <div class="brand">
+        <div class="brand-title">Busultan Trading</div>
+        <div class="brand-sub">
+          إدارة مخاطر احترافية
+          <span class="badge">MULTI-ASSET • FUNDING • R:R</span>
         </div>
       </div>
+      <div class="lang-toggle">
+        AR
+        <span class="dot"></span>
+      </div>
+    </div>
 
-      <div id="secInputs" class="section-title">مدخلات الحساب</div>
+    <h2>حاسبة اللوت المتقدمة</h2>
+    <div class="subtitle">
+      حساب حجم العقد، نسبة المخاطرة، والهامش المطلوب بناءً على بيانات الصفقة.
+    </div>
 
-      <div class="row-2">
-        <div>
-          <label id="lbl_balance">رصيد الحساب (USD):</label>
-          <div class="input-wrapper">
-            <input type="number" id="balance" placeholder="مثال: 10000" />
-          </div>
-        </div>
-        <div>
-          <label id="lbl_riskPercent">نسبة المخاطرة % من الحساب:</label>
-          <div class="input-wrapper">
-            <input type="number" id="riskPercent" placeholder="مثال: 1" />
-          </div>
-        </div>
+    <form id="lotForm">
+      <div class="field">
+        <label for="balance">رصيد الحساب (USD)</label>
+        <span class="example">مثال: 10000</span>
+        <input id="balance" type="number" step="0.01" placeholder="10000" required />
       </div>
 
-      <div class="row-2">
-        <div>
-          <label id="lbl_entry">سعر الدخول (Entry):</label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="entryPrice"
-              step="0.00001"
-              placeholder="مثال: 1.08500 أو 2350.0 للذهب"
-            />
-          </div>
-        </div>
-        <div>
-          <label id="lbl_sl">سعر وقف الخسارة (SL):</label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="slPrice"
-              step="0.00001"
-              placeholder="مثال: 1.08300"
-            />
-          </div>
-        </div>
+      <div class="field">
+        <label for="risk">نسبة المخاطرة من الحساب %</label>
+        <span class="example">مثال: 1 تعني 1% من الرصيد</span>
+        <input id="risk" type="number" step="0.01" placeholder="1" required />
       </div>
 
-      <div class="row-2">
-        <div>
-          <label id="lbl_tp1">هدف 1 (TP1):</label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="tp1"
-              step="0.00001"
-              placeholder="اختياري"
-            />
-          </div>
-        </div>
-        <div>
-          <label id="lbl_tp2">هدف 2 (TP2):</label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="tp2"
-              step="0.00001"
-              placeholder="اختياري"
-            />
-          </div>
-        </div>
+      <div class="field">
+        <label for="entry">سعر الدخول (Entry)</label>
+        <span class="example">مثال EURUSD: 1.08500 أو ذهب XAUUSD: 2350.0</span>
+        <input id="entry" type="number" step="0.00001" placeholder="1.08500" required />
       </div>
 
-      <div class="row-2">
-        <div>
-          <label id="lbl_tp3">هدف 3 (TP3):</label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="tp3"
-              step="0.00001"
-              placeholder="اختياري"
-            />
-          </div>
-        </div>
-        <div></div>
+      <div class="field">
+        <label for="sl">سعر وقف الخسارة (SL)</label>
+        <span class="example">مثال: 1.08300</span>
+        <input id="sl" type="number" step="0.00001" placeholder="1.08300" required />
       </div>
 
-      <div class="row-2">
-        <div>
-          <label id="lbl_lev">الرافعة المالية (Leverage):</label>
-          <div class="input-wrapper">
-            <input type="number" id="leverage" placeholder="مثال: 100 أو 500" />
-          </div>
-        </div>
-        <div>
-          <label id="lbl_instr">نوع الأداة:</label>
-          <div class="input-wrapper">
-            <select id="instrumentType">
-              <option value="FOREX_4">فوركس 4 منازل (EURUSD, GBPUSD, ...)</option>
-              <option value="FOREX_JPY">أزواج الين (USDJPY, EURJPY, ...)</option>
-              <option value="GOLD">ذهب XAUUSD</option>
-              <option value="SILVER">فضة XAGUSD</option>
-              <option value="OIL">نفط (USOIL / UKOIL)</option>
-              <option value="INDEX">مؤشرات (US30, US500, NAS100, GER40, ...)</option>
-            </select>
-            <span class="select-arrow">▼</span>
-          </div>
-        </div>
+      <div class="field">
+        <label for="tp1">هدف 1 (TP1) – اختياري</label>
+        <span class="example">فقط لأجل المتابعة، لا يؤثر في الحساب</span>
+        <input id="tp1" type="number" step="0.00001" placeholder="—" />
       </div>
 
-      <!-- قسم جديد: توليد SL/TP من النسبة -->
-      <div id="secLevels" class="section-title">مستويات الوقف والأهداف من النسبة</div>
-
-      <div class="row-2">
-        <div>
-          <label id="lbl_sideLevels">نوع الصفقة لهذا الحساب:</label>
-          <div class="input-wrapper">
-            <select id="sideLevels">
-              <option value="buy">شراء (Long)</option>
-              <option value="sell">بيع (Short)</option>
-            </select>
-            <span class="select-arrow">▼</span>
-          </div>
-        </div>
-        <div>
-          <label id="lbl_lotLevels">حجم اللوت المستخدم (اختياري):</label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="lotLevels"
-              step="0.01"
-              placeholder="مثال: 1 أو 0.1"
-            />
-          </div>
-        </div>
+      <div class="field">
+        <label for="tp2">هدف 2 (TP2) – اختياري</label>
+        <input id="tp2" type="number" step="0.00001" placeholder="—" />
       </div>
 
-      <div class="row-2">
-        <div>
-          <label id="lbl_rrs">نِسَب الأهداف R:R (1,2,3):</label>
-          <div class="input-wrapper">
-            <input type="number" id="rr1Mul" step="0.1" placeholder="1" />
-          </div>
-          <div class="input-wrapper">
-            <input type="number" id="rr2Mul" step="0.1" placeholder="2" />
-          </div>
-          <div class="input-wrapper">
-            <input type="number" id="rr3Mul" step="0.1" placeholder="3" />
-          </div>
-        </div>
-        <div></div>
+      <div class="field">
+        <label for="tp3">هدف 3 (TP3) – اختياري</label>
+        <input id="tp3" type="number" step="0.00001" placeholder="—" />
       </div>
 
-      <button id="btn_levelsCalc" class="secondary" type="button" onclick="calculateLevels()">
-        احسب مستويات الوقف والأهداف
-      </button>
-
-      <div class="result" id="levelsResultBox" style="display:none;"></div>
-
-      <!-- حسابات التمويل -->
-      <div id="secFunding" class="section-title">حسابات التمويل (Prop)</div>
-
-      <div class="row-2">
-        <div>
-          <label id="lbl_fundingPlan">خطة التمويل:</label>
-          <div class="input-wrapper">
-            <select id="fundingPlan">
-              <option value="none">لا يوجد</option>
-              <option value="50k">50K</option>
-              <option value="100k">100K</option>
-              <option value="200k">200K</option>
-              <option value="custom">مخصص</option>
-            </select>
-            <span class="select-arrow">▼</span>
-          </div>
-        </div>
-        <div>
-          <label id="lbl_fundingSize">حجم الحساب الممول (إن وجد):</label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="fundingSize"
-              placeholder="مثال: 100000"
-            />
-          </div>
-        </div>
+      <div class="field">
+        <label for="leverage">الرافعة المالية (Leverage)</label>
+        <span class="example">مثال: 100 أو 500</span>
+        <input id="leverage" type="number" step="1" placeholder="500" value="500" />
       </div>
 
-      <div class="row-2">
-        <div>
-          <label id="lbl_dailyLossPct">حد الخسارة اليومي %:</label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="dailyLossPct"
-              placeholder="مثال شائع: 5"
-            />
-          </div>
-        </div>
-        <div>
-          <label id="lbl_totalLossPct">حد الخسارة الكلي %:</label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="totalLossPct"
-              placeholder="مثال شائع: 10"
-            />
-          </div>
-        </div>
+      <div class="field full-row">
+        <label for="instrument">نوع الأداة</label>
+        <select id="instrument">
+          <option value="forex">أزواج فوركس رئيسية (EURUSD, GBPUSD ...)</option>
+          <option value="gold">ذهب XAUUSD</option>
+          <option value="indices">مؤشرات (US30, NAS100 ...)</option>
+        </select>
       </div>
 
-      <button id="btn_calc" class="primary" type="button" onclick="calculateLot()">
-        احسب حجم اللوت
-      </button>
+      <div class="full-row btn-row">
+        <button type="submit" class="btn-primary">
+          احسب اللوت
+        </button>
+        <button type="button" id="resetBtn" class="btn-ghost">
+          مسح الحقول
+        </button>
+      </div>
+    </form>
 
-      <button id="btn_save" class="secondary" type="button" onclick="saveTrade()">
-        حفظ الصفقة في سجل Busultan
-      </button>
-
-      <div class="result" id="resultBox" style="display: none"></div>
-
-      <div id="noteText" class="note">
-        • الحسابات تقريبية وتفترض أن عملة الحساب = عملة التسعير (حساب بالدولار وأدوات مسعّرة بالدولار).<br />
-        • استخدم أرقام التمويل وحدود الخسارة حسب شروط الشركة التي تتعامل معها.<br />
-        • سجل الصفقات يتم تخزينه محليًا في جهازك (لا يرفع لأي سيرفر).
-        <div class="pill-row">
-          <div class="pill">Risk-based sizing</div>
-          <div class="pill">Multi-Asset</div>
-          <div class="pill">Funding Accounts</div>
-          <div class="pill">R:R • TP1/TP2</div>
-        </div>
+    <div class="results" id="results" style="display:none;">
+      <div class="result-box">
+        <div class="result-label">حجم اللوت المقترح</div>
+        <div class="result-value" id="lotSize">0.00</div>
+        <div class="result-hint">لوت قياسي تقريبًا</div>
       </div>
 
-      <div id="secHistory" class="section-title">سجل الصفقات (محفوظ في جهازك)</div>
-      <div class="history-card">
-        <table>
-          <thead>
-            <tr>
-              <th id="th_date">التاريخ</th>
-              <th id="th_instrument">أداة</th>
-              <th id="th_direction">اتجاه</th>
-              <th id="th_lot">لوت</th>
-              <th id="th_slPips">SL (نقطة)</th>
-              <th id="th_rr1">R:R1</th>
-              <th id="th_account">حساب</th>
-            </tr>
-          </thead>
-          <tbody id="tradesBody">
-            <tr><td colspan="7" class="no-trades" id="noTradesText">لا توجد صفقات محفوظة بعد</td></tr>
-          </tbody>
-        </table>
+      <div class="result-box">
+        <div class="result-label">المبلغ المعرض للمخاطرة (USD)</div>
+        <div class="result-value" id="riskAmount">0.00</div>
+        <div class="result-hint">قيمة الخسارة إذا ضرب وقف الخسارة</div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-label">عدد النقاط حتى وقف الخسارة</div>
+        <div class="result-value" id="pipDistance">0.0</div>
+        <div class="result-hint">محسوبة حسب نوع الأداة</div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-label">الهامش المطلوب تقريبا</div>
+        <div class="result-value" id="marginRequired">0.00</div>
+        <div class="result-hint">بالدولار، باستخدام الرافعة المحددة</div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-label">حجم العقد الاسمي (وحدات)</div>
+        <div class="result-value" id="notional">0</div>
+        <div class="result-hint">تقريبًا، 1 لوت فوركس = 100,000 وحدة</div>
+      </div>
+
+      <div class="warning">
+        ملاحظة: هذه أرقام تقريبية تعليمية. قد تختلف القيم الفعلية حسب وسيط التداول،
+        نوع الحساب، وفروق الأسعار.
       </div>
     </div>
   </div>
 
   <script>
-    let lastResult = null;
-    let currentLang = localStorage.getItem("busultan_lang") || "ar";
-
-    function getInstrumentParams(type) {
-      switch (type) {
-        case "FOREX_4":
-          return { contractSize: 100000, pipSize: 0.0001, label: "FX-4" };
-        case "FOREX_JPY":
-          return { contractSize: 100000, pipSize: 0.01, label: "FX-JPY" };
-        case "GOLD":
-          return { contractSize: 100, pipSize: 0.1, label: "XAUUSD" };
-        case "SILVER":
-          return { contractSize: 5000, pipSize: 0.01, label: "XAGUSD" };
-        case "OIL":
-          return { contractSize: 1000, pipSize: 0.01, label: "OIL" };
-        case "INDEX":
-          return { contractSize: 1, pipSize: 1, label: "INDEX" };
-        default:
-          return { contractSize: 100000, pipSize: 0.0001, label: "FX" };
+    // إعدادات تقريبية لكل نوع أداة
+    const instrumentConfig = {
+      forex: {
+        pipSize: 0.0001, // فرق النقطة
+        pipValuePerLot: 10, // قيمة النقطة لوت قياسي (تقريبًا 10$)
+        contractSize: 100000
+      },
+      gold: {
+        pipSize: 0.1, // حركة 0.1
+        pipValuePerLot: 10, // تقريبًا 10$ لكل 0.1
+        contractSize: 100
+      },
+      indices: {
+        pipSize: 1, // نقطة واحدة في المؤشر
+        pipValuePerLot: 1, // 1$ لكل نقطة – افتراض
+        contractSize: 1
       }
-    }
+    };
 
-    function applyFundingPreset() {
-      const plan = document.getElementById("fundingPlan").value;
-      const fundingSize = document.getElementById("fundingSize");
-      const dailyLossPct = document.getElementById("dailyLossPct");
-      const totalLossPct = document.getElementById("totalLossPct");
+    const form = document.getElementById("lotForm");
+    const resultsBox = document.getElementById("results");
 
-      if (plan === "50k") {
-        fundingSize.value = 50000;
-        dailyLossPct.value = 5;
-        totalLossPct.value = 10;
-      } else if (plan === "100k") {
-        fundingSize.value = 100000;
-        dailyLossPct.value = 5;
-        totalLossPct.value = 10;
-      } else if (plan === "200k") {
-        fundingSize.value = 200000;
-        dailyLossPct.value = 5;
-        totalLossPct.value = 10;
-      }
-    }
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
 
-    document
-      .getElementById("fundingPlan")
-      .addEventListener("change", applyFundingPreset);
-
-    function formatNumber(num, decimals) {
-      return Number(num).toFixed(decimals);
-    }
-
-    function calculateLot() {
       const balance = parseFloat(document.getElementById("balance").value);
-      const riskPercent = parseFloat(
-        document.getElementById("riskPercent").value
-      );
-      const entryPrice = parseFloat(
-        document.getElementById("entryPrice").value
-      );
-      const slPrice = parseFloat(document.getElementById("slPrice").value);
-      const tp1 = parseFloat(document.getElementById("tp1").value);
-      const tp2 = parseFloat(document.getElementById("tp2").value);
-      const tp3 = parseFloat(document.getElementById("tp3").value);
-      const leverage = parseFloat(document.getElementById("leverage").value);
-      const instrumentType =
-        document.getElementById("instrumentType").value;
-
-      const fundingSize = parseFloat(
-        document.getElementById("fundingSize").value
-      );
-      const dailyLossPct = parseFloat(
-        document.getElementById("dailyLossPct").value
-      );
-      const totalLossPct = parseFloat(
-        document.getElementById("totalLossPct").value
-      );
-
-      const resultBox = document.getElementById("resultBox");
+      const riskPercent = parseFloat(document.getElementById("risk").value);
+      const entry = parseFloat(document.getElementById("entry").value);
+      const sl = parseFloat(document.getElementById("sl").value);
+      const leverage = parseFloat(document.getElementById("leverage").value || 1);
+      const instrumentKey = document.getElementById("instrument").value;
 
       if (
-        isNaN(balance) ||
-        isNaN(riskPercent) ||
-        isNaN(entryPrice) ||
-        isNaN(slPrice) ||
-        isNaN(leverage)
+        !isFinite(balance) ||
+        !isFinite(riskPercent) ||
+        !isFinite(entry) ||
+        !isFinite(sl) ||
+        balance <= 0 ||
+        riskPercent <= 0
       ) {
-        resultBox.style.display = "block";
-        resultBox.classList.add("error");
-        resultBox.innerHTML =
-          currentLang === "ar"
-            ? "رجاءً تأكد من تعبئة رصيد الحساب، نسبة المخاطرة، سعر الدخول، وقف الخسارة، والرافعة."
-            : "Please fill balance, risk %, entry price, stop loss and leverage correctly.";
+        alert("رجاءً تأكد من إدخال بيانات صحيحة في الحقول الأساسية.");
         return;
       }
 
-      const params = getInstrumentParams(instrumentType);
-      const contractSize = params.contractSize;
-      const pipSize = params.pipSize;
+      const config = instrumentConfig[instrumentKey];
+      const pipDistanceRaw = Math.abs(entry - sl);
+      const pipDistance = pipDistanceRaw / config.pipSize;
 
-      const stopLossPips = Math.abs(entryPrice - slPrice) / pipSize;
-
-      if (stopLossPips <= 0) {
-        resultBox.style.display = "block";
-        resultBox.classList.add("error");
-        resultBox.innerHTML =
-          currentLang === "ar"
-            ? "سعر الدخول ووقف الخسارة متساويان أو الفرق صفر. عدّل القيم أولاً."
-            : "Entry price and stop loss are equal or difference is zero. Adjust them first.";
+      if (!isFinite(pipDistance) || pipDistance === 0) {
+        alert("مسافة الوقف صفر تقريبًا، رجاءً عدّل سعر الدخول أو وقف الخسارة.");
         return;
       }
-
-      const pipValuePerLot = contractSize * pipSize;
-      const riskAmount = balance * (riskPercent / 100);
-      const lotSize = riskAmount / (stopLossPips * pipValuePerLot);
-      const pipValueActual = pipValuePerLot * lotSize;
-      const positionNotional = contractSize * lotSize * entryPrice;
-      const marginRequired = positionNotional / leverage;
-
-      let rr1 = null;
-      let rr2 = null;
-      let rr3 = null;
-
-      // تحديد الاتجاه
-      let direction = entryPrice < slPrice
-        ? (currentLang === "ar" ? "بيع" : "Sell")
-        : (currentLang === "ar" ? "شراء" : "Buy");
-
-      // خانة الاتجاه مع سهم
-      let dirHtml;
-      if (currentLang === "ar") {
-        if (direction === "شراء") {
-          dirHtml = "<span class='direction-tag direction-buy'>⬆ " + direction + "</span>";
-        } else {
-          dirHtml = "<span class='direction-tag direction-sell'>⬇ " + direction + "</span>";
-        }
-      } else {
-        if (direction === "Buy") {
-          dirHtml = "<span class='direction-tag direction-buy'>⬆ " + direction + "</span>";
-        } else {
-          dirHtml = "<span class='direction-tag direction-sell'>⬇ " + direction + "</span>";
-        }
-      }
-
-      if (!isNaN(tp1)) {
-        const profitPips1 = Math.abs(tp1 - entryPrice) / pipSize;
-        rr1 = profitPips1 / stopLossPips;
-      }
-      if (!isNaN(tp2)) {
-        const profitPips2 = Math.abs(tp2 - entryPrice) / pipSize;
-        rr2 = profitPips2 / stopLossPips;
-      }
-      if (!isNaN(tp3)) {
-        const profitPips3 = Math.abs(tp3 - entryPrice) / pipSize;
-        rr3 = profitPips3 / stopLossPips;
-      }
-
-      let fundingText = "";
-      if (!isNaN(fundingSize) && !isNaN(dailyLossPct) && !isNaN(totalLossPct)) {
-        const dailyLimit = (fundingSize * dailyLossPct) / 100;
-        const totalLimit = (fundingSize * totalLossPct) / 100;
-        const dailyUsage = (riskAmount / dailyLimit) * 100;
-        const totalUsage = (riskAmount / totalLimit) * 100;
-
-        if (currentLang === "ar") {
-          fundingText =
-            "<br><br><b>تحليل حساب التمويل:</b><br>" +
-            "حد الخسارة اليومي: " +
-            formatNumber(dailyLimit, 2) +
-            " (" +
-            dailyLossPct +
-            "%) — تستخدم منها تقريباً " +
-            formatNumber(dailyUsage, 1) +
-            "% بهذه الصفقة.<br>" +
-            "حد الخسارة الكلي: " +
-            formatNumber(totalLimit, 2) +
-            " (" +
-            totalLossPct +
-            "%) — تستخدم منها تقريباً " +
-            formatNumber(totalUsage, 1) +
-            "%.";
-        } else {
-          fundingText =
-            "<br><br><b>Funding account analysis:</b><br>" +
-            "Daily loss limit: " +
-            formatNumber(dailyLimit, 2) +
-            " (" +
-            dailyLossPct +
-            "%) — this trade uses about " +
-            formatNumber(dailyUsage, 1) +
-            "% of it.<br>" +
-            "Total loss limit: " +
-            formatNumber(totalLimit, 2) +
-            " (" +
-            totalLossPct +
-            "%) — this trade uses about " +
-            formatNumber(totalUsage, 1) +
-            "% of it.";
-        }
-      }
-
-      let rrText = "";
-      if (rr1 || rr2 || rr3) {
-        if (currentLang === "ar") {
-          rrText += "<br><br><b>تحليل R:R للأهداف:</b><br>";
-          if (rr1) {
-            rrText += "الهدف 1 (TP1): R:R ≈ " + formatNumber(rr1, 2) + "<br>";
-          }
-          if (rr2) {
-            rrText += "الهدف 2 (TP2): R:R ≈ " + formatNumber(rr2, 2) + "<br>";
-          }
-          if (rr3) {
-            rrText += "الهدف 3 (TP3): R:R ≈ " + formatNumber(rr3, 2) + "<br>";
-          }
-        } else {
-          rrText += "<br><br><b>R:R analysis for targets:</b><br>";
-          if (rr1) {
-            rrText += "Target 1 (TP1): R:R ≈ " + formatNumber(rr1, 2) + "<br>";
-          }
-          if (rr2) {
-            rrText += "Target 2 (TP2): R:R ≈ " + formatNumber(rr2, 2) + "<br>";
-          }
-          if (rr3) {
-            rrText += "Target 3 (TP3): R:R ≈ " + formatNumber(rr3, 2) + "<br>";
-          }
-        }
-      }
-
-      if (currentLang === "ar") {
-        resultBox.innerHTML =
-          dirHtml + "<br>" +
-          "حجم اللوت المقترح: <b>" +
-          formatNumber(lotSize, 3) +
-          " لوت</b> (" +
-          direction +
-          ")<br>" +
-          "عدد نقاط وقف الخسارة: <b>" +
-          formatNumber(stopLossPips, 1) +
-          " نقطة</b><br>" +
-          "المبلغ المعرض للخسارة: <b>" +
-          formatNumber(riskAmount, 2) +
-          "</b> من عملة الحساب<br>" +
-          "قيمة النقطة التقريبية: <b>" +
-          formatNumber(pipValueActual, 2) +
-          "</b> لكل نقطة<br>" +
-          "الهامش المطلوب تقريبياً: <b>" +
-          formatNumber(marginRequired, 2) +
-          "</b>" +
-          rrText +
-          fundingText;
-      } else {
-        resultBox.innerHTML =
-          dirHtml + "<br>" +
-          "Suggested lot size: <b>" +
-          formatNumber(lotSize, 3) +
-          " lots</b> (" +
-          direction +
-          ")<br>" +
-          "Stop-loss distance: <b>" +
-          formatNumber(stopLossPips, 1) +
-          " pips</b><br>" +
-          "Risk amount: <b>" +
-          formatNumber(riskAmount, 2) +
-          "</b> in account currency<br>" +
-          "Approx. pip value: <b>" +
-          formatNumber(pipValueActual, 2) +
-          "</b> per pip<br>" +
-          "Approx. required margin: <b>" +
-          formatNumber(marginRequired, 2) +
-          "</b>" +
-          rrText +
-          fundingText;
-      }
-
-      resultBox.style.display = "block";
-      resultBox.classList.remove("error");
-
-      lastResult = {
-        timestamp: new Date().toISOString(),
-        instrumentLabel: params.label,
-        direction,
-        lotSize,
-        stopLossPips,
-        rr1,
-        balance,
-        riskPercent
-      };
-
-      renderTrades();
-    }
-
-    // دالة جديدة: توليد SL/TP1/2/3 من النسبة
-    function calculateLevels() {
-      const balance = parseFloat(document.getElementById("balance").value);
-      const riskPercent = parseFloat(document.getElementById("riskPercent").value);
-      const entryPrice = parseFloat(document.getElementById("entryPrice").value);
-      const leverage = parseFloat(document.getElementById("leverage").value);
-      const instrumentType = document.getElementById("instrumentType").value;
-      const side = document.getElementById("sideLevels").value;
-      const lotLevels = parseFloat(document.getElementById("lotLevels").value);
-      let rr1Mul = parseFloat(document.getElementById("rr1Mul").value);
-      let rr2Mul = parseFloat(document.getElementById("rr2Mul").value);
-      let rr3Mul = parseFloat(document.getElementById("rr3Mul").value);
-
-      const box = document.getElementById("levelsResultBox");
-
-      if (isNaN(balance) || isNaN(riskPercent) || isNaN(entryPrice) || isNaN(leverage)) {
-        box.style.display = "block";
-        box.classList.add("error");
-        box.innerHTML =
-          currentLang === "ar"
-            ? "لتوليد مستويات SL/TP من النسبة، أدخل رصيد الحساب، نسبة المخاطرة، سعر الدخول، والرافعة على الأقل."
-            : "To generate SL/TP levels from %, please fill balance, risk %, entry price and leverage.";
-        return;
-      }
-
-      const params = getInstrumentParams(instrumentType);
-      const contractSize = params.contractSize;
-      const pipSize = params.pipSize;
-
-      // رقم المنازل لعكس pipSize
-      let priceDecimals = 2;
-      if (pipSize === 0.0001) priceDecimals = 5;
-      else if (pipSize === 0.01) priceDecimals = 3;
-      else if (pipSize === 0.1) priceDecimals = 2;
 
       const riskAmount = balance * (riskPercent / 100);
+      const lotSize = riskAmount / (pipDistance * config.pipValuePerLot);
 
-      // حجم اللوت المستخدم: إما مدخل من المستخدم أو أكبر لوت ممكن حسب الرافعة
-      let lotUsed;
-      if (!isNaN(lotLevels) && lotLevels > 0) {
-        lotUsed = lotLevels;
-      } else {
-        const maxNotional = balance * leverage;
-        const notionalPerLot = contractSize * entryPrice;
-        lotUsed = maxNotional / notionalPerLot;
-        if (!isFinite(lotUsed) || lotUsed <= 0) {
-          lotUsed = 1;
-        }
-      }
+      // حجم العقد الاسمي
+      const notional = lotSize * config.contractSize;
 
-      // نسب R:R الافتراضية
-      if (isNaN(rr1Mul) || rr1Mul <= 0) rr1Mul = 1;
-      if (isNaN(rr2Mul) || rr2Mul <= 0) rr2Mul = 2;
-      if (isNaN(rr3Mul) || rr3Mul <= 0) rr3Mul = 3;
+      // الهامش المطلوب (تقريبي)
+      const marginRequired = leverage > 0 ? notional / leverage : 0;
 
-      const pipValuePerLot = contractSize * pipSize;
-      const pipValueActual = pipValuePerLot * lotUsed;
-      if (!isFinite(pipValueActual) || pipValueActual <= 0) {
-        box.style.display = "block";
-        box.classList.add("error");
-        box.innerHTML =
-          currentLang === "ar"
-            ? "تعذر حساب قيمة النقطة من المعطيات الحالية. تحقق من نوع الأداة وسعر الدخول."
-            : "Failed to compute pip value from current inputs. Check instrument type and entry price.";
-        return;
-      }
+      // عرض النتائج
+      document.getElementById("lotSize").textContent = lotSize.toFixed(2);
+      document.getElementById("riskAmount").textContent = riskAmount.toFixed(2);
+      document.getElementById("pipDistance").textContent =
+        pipDistance.toFixed(1);
+      document.getElementById("marginRequired").textContent =
+        marginRequired.toFixed(2);
+      document.getElementById("notional").textContent = Math.round(notional).toLocaleString(
+        "en-US"
+      );
 
-      const riskPips = riskAmount / pipValueActual;
-      const priceDelta = riskPips * pipSize;
-
-      let sl, tp1, tp2, tp3;
-      if (side === "buy") {
-        sl = entryPrice - priceDelta;
-        tp1 = entryPrice + rr1Mul * priceDelta;
-        tp2 = entryPrice + rr2Mul * priceDelta;
-        tp3 = entryPrice + rr3Mul * priceDelta;
-      } else {
-        sl = entryPrice + priceDelta;
-        tp1 = entryPrice - rr1Mul * priceDelta;
-        tp2 = entryPrice - rr2Mul * priceDelta;
-        tp3 = entryPrice - rr3Mul * priceDelta;
-      }
-
-      // تعبئة الخانات الأساسية
-      document.getElementById("slPrice").value = sl.toFixed(priceDecimals);
-      document.getElementById("tp1").value = tp1.toFixed(priceDecimals);
-      document.getElementById("tp2").value = tp2.toFixed(priceDecimals);
-      document.getElementById("tp3").value = tp3.toFixed(priceDecimals);
-
-      box.style.display = "block";
-      box.classList.remove("error");
-
-      const dirTextAr = side === "buy" ? "شراء" : "بيع";
-      const dirTextEn = side === "buy" ? "Buy" : "Sell";
-
-      if (currentLang === "ar") {
-        box.innerHTML =
-          "<b>اتجاه الصفقة:</b> " + (side === "buy" ? "⬆ " + dirTextAr : "⬇ " + dirTextAr) + "<br>" +
-          "المبلغ المعرض للخسارة: <b>" + formatNumber(riskAmount, 2) + "</b> (" + riskPercent + "% من الحساب) باستخدام لوت ≈ " + formatNumber(lotUsed, 2) + "<br>" +
-          "المسافة إلى وقف الخسارة: <b>" + formatNumber(riskPips, 1) + "</b> نقطة تقريباً<br><br>" +
-          "<b>المستويات المقترحة:</b><br>" +
-          "وقف الخسارة (SL): <b>" + sl.toFixed(priceDecimals) + "</b><br>" +
-          "الهدف 1 (TP1) عند R:R = " + rr1Mul + ": <b>" + tp1.toFixed(priceDecimals) + "</b><br>" +
-          "الهدف 2 (TP2) عند R:R = " + rr2Mul + ": <b>" + tp2.toFixed(priceDecimals) + "</b><br>" +
-          "الهدف 3 (TP3) عند R:R = " + rr3Mul + ": <b>" + tp3.toFixed(priceDecimals) + "</b><br>" +
-          "<br>يمكنك الآن الضغط على زر <b>احسب حجم اللوت</b> لاشتقاق اللوت بناءً على نفس المستويات.";
-      } else {
-        box.innerHTML =
-          "<b>Trade side:</b> " + (side === "buy" ? "⬆ " + dirTextEn : "⬇ " + dirTextEn) + "<br>" +
-          "Risk amount: <b>" + formatNumber(riskAmount, 2) + "</b> (" + riskPercent + "% of balance) using lot ≈ " + formatNumber(lotUsed, 2) + "<br>" +
-          "SL distance: <b>" + formatNumber(riskPips, 1) + "</b> pips approx<br><br>" +
-          "<b>Suggested levels:</b><br>" +
-          "Stop loss (SL): <b>" + sl.toFixed(priceDecimals) + "</b><br>" +
-          "Target 1 (TP1) at R:R = " + rr1Mul + ": <b>" + tp1.toFixed(priceDecimals) + "</b><br>" +
-          "Target 2 (TP2) at R:R = " + rr2Mul + ": <b>" + tp2.toFixed(priceDecimals) + "</b><br>" +
-          "Target 3 (TP3) at R:R = " + rr3Mul + ": <b>" + tp3.toFixed(priceDecimals) + "</b><br>" +
-          "<br>You can now click <b>Calculate lot size</b> to derive lot based on these levels.";
-      }
-    }
-
-    function saveTrade() {
-      const resultBox = document.getElementById("resultBox");
-      if (!lastResult) {
-        resultBox.style.display = "block";
-        resultBox.classList.add("error");
-        resultBox.innerHTML =
-          currentLang === "ar"
-            ? "احسب الصفقة أولاً قبل محاولة حفظها."
-            : "Calculate the trade first before saving.";
-        return;
-      }
-
-      let trades = [];
-      try {
-        const stored = localStorage.getItem("busultan_trades");
-        if (stored) {
-          trades = JSON.parse(stored);
-        }
-      } catch (e) {
-        trades = [];
-      }
-
-      trades.unshift(lastResult);
-      if (trades.length > 50) trades.pop();
-
-      localStorage.setItem("busultan_trades", JSON.stringify(trades));
-
-      resultBox.style.display = "block";
-      resultBox.classList.remove("error");
-      resultBox.innerHTML =
-        currentLang === "ar"
-          ? "تم حفظ الصفقة في سجل Busultan المحلي. يمكنك مراجعتها في جدول الصفقات بالأسفل."
-          : "Trade saved to local Busultan log. You can review it in the table below.";
-
-      renderTrades();
-    }
-
-    function renderTrades() {
-      const tbody = document.getElementById("tradesBody");
-      let trades = [];
-      try {
-        const stored = localStorage.getItem("busultan_trades");
-        if (stored) {
-          trades = JSON.parse(stored);
-        }
-      } catch (e) {
-        trades = [];
-      }
-
-      if (!trades.length) {
-        tbody.innerHTML =
-          '<tr><td colspan="7" class="no-trades" id="noTradesTextInner">' +
-          (currentLang === "ar"
-            ? "لا توجد صفقات محفوظة بعد"
-            : "No saved trades yet") +
-          "</td></tr>";
-        return;
-      }
-
-      tbody.innerHTML = "";
-      trades.forEach((t) => {
-        const tr = document.createElement("tr");
-        const date = new Date(t.timestamp);
-        const dateStr =
-          date.toLocaleDateString(currentLang === "ar" ? "ar-EG" : "en-GB") +
-          " " +
-          date.toLocaleTimeString(currentLang === "ar" ? "ar-EG" : "en-GB", {
-            hour: "2-digit",
-            minute: "2-digit"
-          });
-
-        tr.innerHTML =
-          "<td>" +
-          dateStr +
-          "</td>" +
-          "<td>" +
-          (t.instrumentLabel || "") +
-          "</td>" +
-          "<td>" +
-          (t.direction || "") +
-          "</td>" +
-          "<td>" +
-          (t.lotSize ? formatNumber(t.lotSize, 3) : "") +
-          "</td>" +
-          "<td>" +
-          (t.stopLossPips ? formatNumber(t.stopLossPips, 1) : "") +
-          "</td>" +
-          "<td>" +
-          (t.rr1 ? "≈" + formatNumber(t.rr1, 2) : "-") +
-          "</td>" +
-          "<td>" +
-          (t.balance ? formatNumber(t.balance, 0) + " / " + t.riskPercent + "%" : "") +
-          "</td>";
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    function applyLanguage() {
-      const isAr = currentLang === "ar";
-      document.documentElement.lang = isAr ? "ar" : "en";
-      document.documentElement.dir = isAr ? "rtl" : "ltr";
-
-      document.getElementById("langLabel").textContent = isAr ? "AR" : "EN";
-
-      document.getElementById("logoTextMain").textContent = "Busultan Trading";
-      document.getElementById("logoTextSub").textContent = isAr
-        ? "محرك إدارة مخاطر احترافي"
-        : "PRO RISK ENGINE";
-
-      document.getElementById("badgeMain").textContent = "LOT ENGINE v2.0";
-      document.getElementById("badgeSecondary").textContent = isAr
-        ? "Multi-Asset • Funding • R:R"
-        : "Multi-Asset • Funding • R:R";
-
-      document.getElementById("mainTitle").textContent = isAr
-        ? "حاسبة اللوت المتقدمة"
-        : "Advanced Lot Size Calculator";
-
-      document.getElementById("subtitle").textContent = isAr
-        ? "إدارة مخاطرة احترافية: فوركس، ذهب، نفط، مؤشرات، وحسابات تمويل مع حفظ الصفقات."
-        : "Professional risk engine: FX, gold, oil, indices and funding accounts with trade log.";
-
-      document.getElementById("secInputs").textContent = isAr
-        ? "مدخلات الحساب"
-        : "Account inputs";
-
-      document.getElementById("secLevels").textContent = isAr
-        ? "مستويات الوقف والأهداف من النسبة"
-        : "SL & TP levels from % risk";
-
-      document.getElementById("secFunding").textContent = isAr
-        ? "حسابات التمويل (Prop)"
-        : "Funding accounts (Prop)";
-
-      document.getElementById("secHistory").textContent = isAr
-        ? "سجل الصفقات (محفوظ في جهازك)"
-        : "Trade history (stored on your device)";
-
-      document.getElementById("lbl_balance").textContent = isAr
-        ? "رصيد الحساب (USD):"
-        : "Account balance (USD):";
-
-      document.getElementById("lbl_riskPercent").textContent = isAr
-        ? "نسبة المخاطرة % من الحساب:"
-        : "Risk percentage % of balance:";
-
-      document.getElementById("lbl_entry").textContent = isAr
-        ? "سعر الدخول (Entry):"
-        : "Entry price:";
-
-      document.getElementById("lbl_sl").textContent = isAr
-        ? "سعر وقف الخسارة (SL):"
-        : "Stop loss price (SL):";
-
-      document.getElementById("lbl_tp1").textContent = isAr
-        ? "هدف 1 (TP1):"
-        : "Target 1 (TP1):";
-
-      document.getElementById("lbl_tp2").textContent = isAr
-        ? "هدف 2 (TP2):"
-        : "Target 2 (TP2):";
-
-      document.getElementById("lbl_tp3").textContent = isAr
-        ? "هدف 3 (TP3):"
-        : "Target 3 (TP3):";
-
-      document.getElementById("lbl_lev").textContent = isAr
-        ? "الرافعة المالية (Leverage):"
-        : "Leverage:";
-
-      document.getElementById("lbl_instr").textContent = isAr
-        ? "نوع الأداة:"
-        : "Instrument type:";
-
-      document.getElementById("lbl_sideLevels").textContent = isAr
-        ? "نوع الصفقة لهذا الحساب:"
-        : "Trade side for this calc:";
-
-      document.getElementById("lbl_lotLevels").textContent = isAr
-        ? "حجم اللوت المستخدم (اختياري):"
-        : "Lot size used (optional):";
-
-      document.getElementById("lbl_rrs").textContent = isAr
-        ? "نِسَب الأهداف R:R (1,2,3):"
-        : "Targets R:R multiples (1,2,3):";
-
-      document.getElementById("lbl_fundingPlan").textContent = isAr
-        ? "خطة التمويل:"
-        : "Funding plan:";
-
-      document.getElementById("lbl_fundingSize").textContent = isAr
-        ? "حجم الحساب الممول (إن وجد):"
-        : "Funding account size (if any):";
-
-      document.getElementById("lbl_dailyLossPct").textContent = isAr
-        ? "حد الخسارة اليومي %:"
-        : "Daily loss limit %:";
-
-      document.getElementById("lbl_totalLossPct").textContent = isAr
-        ? "حد الخسارة الكلي %:"
-        : "Total loss limit %:";
-
-      document.getElementById("btn_calc").textContent = isAr
-        ? "احسب حجم اللوت"
-        : "Calculate lot size";
-
-      document.getElementById("btn_save").textContent = isAr
-        ? "حفظ الصفقة في سجل Busultan"
-        : "Save trade to Busultan log";
-
-      document.getElementById("btn_levelsCalc").textContent = isAr
-        ? "احسب مستويات الوقف والأهداف"
-        : "Calculate SL/TP levels";
-
-      document.getElementById("noteText").innerHTML = isAr
-        ? "• الحسابات تقريبية وتفترض أن عملة الحساب = عملة التسعير (حساب بالدولار وأدوات مسعّرة بالدولار).<br />" +
-          "• استخدم أرقام التمويل وحدود الخسارة حسب شروط الشركة التي تتعامل معها.<br />" +
-          "• سجل الصفقات يتم تخزينه محليًا في جهازك (لا يرفع لأي سيرفر)." +
-          '<div class="pill-row">' +
-          '<div class="pill">Risk-based sizing</div>' +
-          '<div class="pill">Multi-Asset</div>' +
-          '<div class="pill">Funding Accounts</div>' +
-          '<div class="pill">R:R • TP1/TP2</div>' +
-          "</div>"
-        : "• Calculations are approximate and assume account currency = quote currency (USD account with USD-quoted instruments).<br />" +
-          "• Use funding limits and risk rules according to your prop firm's conditions.<br />" +
-          "• Trades are stored locally on your device only (nothing is uploaded)." +
-          '<div class="pill-row">' +
-          '<div class="pill">Risk-based sizing</div>' +
-          '<div class="pill">Multi-Asset</div>' +
-          '<div class="pill">Funding Accounts</div>' +
-          '<div class="pill">R:R • TP1/TP2</div>' +
-          "</div>";
-
-      document.getElementById("th_date").textContent = isAr ? "التاريخ" : "Date";
-      document.getElementById("th_instrument").textContent = isAr ? "أداة" : "Instrument";
-      document.getElementById("th_direction").textContent = isAr ? "اتجاه" : "Side";
-      document.getElementById("th_lot").textContent = isAr ? "لوت" : "Lot";
-      document.getElementById("th_slPips").textContent = isAr ? "SL (نقطة)" : "SL (pips)";
-      document.getElementById("th_rr1").textContent = "R:R1";
-      document.getElementById("th_account").textContent = isAr ? "حساب" : "Account";
-
-      document.getElementById("balance").placeholder = isAr ? "مثال: 10000" : "Ex: 10000";
-      document.getElementById("riskPercent").placeholder = isAr ? "مثال: 1" : "Ex: 1";
-      document.getElementById("entryPrice").placeholder = isAr
-        ? "مثال: 1.08500 أو 2350.0 للذهب"
-        : "Ex: 1.08500 or 2350.0 for gold";
-      document.getElementById("slPrice").placeholder = isAr ? "مثال: 1.08300" : "Ex: 1.08300";
-      document.getElementById("tp1").placeholder = isAr ? "اختياري" : "Optional";
-      document.getElementById("tp2").placeholder = isAr ? "اختياري" : "Optional";
-      document.getElementById("tp3").placeholder = isAr ? "اختياري" : "Optional";
-      document.getElementById("leverage").placeholder = isAr ? "مثال: 100 أو 500" : "Ex: 100 or 500";
-      document.getElementById("fundingSize").placeholder = isAr ? "مثال: 100000" : "Ex: 100000";
-      document.getElementById("dailyLossPct").placeholder = isAr ? "مثال شائع: 5" : "Common: 5";
-      document.getElementById("totalLossPct").placeholder = isAr ? "مثال شائع: 10" : "Common: 10";
-      document.getElementById("lotLevels").placeholder = isAr ? "مثال: 1 أو 0.1" : "Ex: 1 or 0.1";
-      document.getElementById("rr1Mul").placeholder = isAr ? "1" : "1";
-      document.getElementById("rr2Mul").placeholder = isAr ? "2" : "2";
-      document.getElementById("rr3Mul").placeholder = isAr ? "3" : "3";
-
-      const inst = document.getElementById("instrumentType").options;
-      if (isAr) {
-        inst[0].text = "فوركس 4 منازل (EURUSD, GBPUSD, ...)";
-        inst[1].text = "أزواج الين (USDJPY, EURJPY, ...)";
-        inst[2].text = "ذهب XAUUSD";
-        inst[3].text = "فضة XAGUSD";
-        inst[4].text = "نفط (USOIL / UKOIL)";
-        inst[5].text = "مؤشرات (US30, US500, NAS100, GER40, ...)";
-      } else {
-        inst[0].text = "Forex 4-digit pairs (EURUSD, GBPUSD, ...)";
-        inst[1].text = "JPY pairs (USDJPY, EURJPY, ...)";
-        inst[2].text = "Gold XAUUSD";
-        inst[3].text = "Silver XAGUSD";
-        inst[4].text = "Oil (USOIL / UKOIL)";
-        inst[5].text = "Indices (US30, US500, NAS100, GER40, ...)";
-      }
-
-      const fp = document.getElementById("fundingPlan").options;
-      if (isAr) {
-        fp[0].text = "لا يوجد";
-        fp[1].text = "50K";
-        fp[2].text = "100K";
-        fp[3].text = "200K";
-        fp[4].text = "مخصص";
-      } else {
-        fp[0].text = "None";
-        fp[1].text = "50K";
-        fp[2].text = "100K";
-        fp[3].text = "200K";
-        fp[4].text = "Custom";
-      }
-
-      const sideOpts = document.getElementById("sideLevels").options;
-      if (isAr) {
-        sideOpts[0].text = "شراء (Long)";
-        sideOpts[1].text = "بيع (Short)";
-      } else {
-        sideOpts[0].text = "Buy (Long)";
-        sideOpts[1].text = "Sell (Short)";
-      }
-
-      const isLight = document.body.classList.contains("light");
-      document.getElementById("themeLabel").textContent = isAr
-        ? isLight ? "وضع نهاري" : "وضع ليلي"
-        : isLight ? "Light mode" : "Dark mode";
-
-      renderTrades();
-    }
-
-    function initTheme() {
-      const saved = localStorage.getItem("busultan_theme");
-      if (saved === "light") {
-        document.body.classList.add("light");
-      }
-    }
-
-    document.getElementById("themeToggle").addEventListener("click", () => {
-      document.body.classList.toggle("light");
-      const isLight = document.body.classList.contains("light");
-      const isAr = currentLang === "ar";
-      document.getElementById("themeLabel").textContent = isAr
-        ? isLight ? "وضع نهاري" : "وضع ليلي"
-        : isLight ? "Light mode" : "Dark mode";
-      localStorage.setItem("busultan_theme", isLight ? "light" : "dark");
+      resultsBox.style.display = "grid";
     });
 
-    document.getElementById("langToggle").addEventListener("click", () => {
-      currentLang = currentLang === "ar" ? "en" : "ar";
-      localStorage.setItem("busultan_lang", currentLang);
-      applyLanguage();
+    document.getElementById("resetBtn").addEventListener("click", function () {
+      form.reset();
+      resultsBox.style.display = "none";
     });
-
-    initTheme();
-    applyLanguage();
   </script>
 </body>
 </html>
