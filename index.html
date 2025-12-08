@@ -1,319 +1,127 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>Busultan V10 – Advanced Lot Calculator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-      background: #000;
-      background-image: radial-gradient(circle at top, rgba(0,0,0,0.3), rgba(0,0,0,0.9)), url("busultan-bg.jpg");
-      background-size: cover;
-      background-attachment: fixed;
-      color: var(--text-main);
-      padding: 20px;
-    }
-
-    /* --------------------- Theme ---------------------- */
-    body.theme-dark {
-      --text-main: #f5f7ff;
-      --card-bg: rgba(8,12,32,0.92);
-      --border: rgba(255,255,255,0.08);
-      --input-bg: rgba(0,0,0,0.35);
-    }
-
-    body.theme-light {
-      --text-main: #111;
-      --card-bg: rgba(255,255,255,0.98);
-      --border: rgba(0,0,0,0.08);
-      --input-bg: rgba(0,0,0,0.05);
-    }
-
-    /* Card container */
-    .container {
-      width: 100%;
-      max-width: 950px;
-      margin: auto;
-      background: var(--card-bg);
-      padding: 25px;
-      border-radius: 22px;
-      border: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 60px rgba(0,0,0,0.8);
-    }
-
-    /* Top nav */
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .nav-buttons {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .nav-btn {
-      padding: 6px 12px;
-      font-size: 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: var(--text-main);
-    }
-    .nav-btn.active {
-      background: linear-gradient(135deg,#4b8bff,#af48ff);
-      border: none;
-    }
-
-    /* Logo */
-    .logo {
-      width: 85px;
-      height: 85px;
-      border-radius: 50%;
-      background: radial-gradient(circle,#0af,#90f);
-      padding: 3px;
-      box-shadow: 0 0 20px #0af;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo img {
-      width: 100%;
-      border-radius: 50%;
-    }
-
-    /* Title */
-    .title {
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    .subtitle {
-      text-align: center;
-      opacity: 0.7;
-      font-size: 12px;
-      margin-bottom: 20px;
-    }
-
-    /* Form layout */
-    form {
-      display: grid;
-      grid-template-columns: repeat(2,1fr);
-      gap: 15px;
-    }
-    form .full { grid-column: 1 / -1; }
-
-    label {
-      font-size: 12px;
-      margin-bottom: 4px;
-      display: block;
-      opacity: 0.85;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--input-bg);
-      color: var(--text-main);
-      font-size: 13px;
-      outline: none;
-    }
-
-    .btn-primary {
-      padding: 10px 18px;
-      border-radius: 12px;
-      background: linear-gradient(135deg,#22c55e,#16a34a);
-      border: none;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .btn-ghost {
-      padding: 10px 18px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      color: var(--text-main);
-    }
-
-    /* Results box */
-    .results {
-      margin-top: 20px;
-      padding: 20px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.03);
-    }
-
-    .result-grid {
-      display: grid;
-      grid-template-columns: repeat(3,1fr);
-      gap: 10px;
-    }
-
-    .result-box {
-      padding: 10px;
-      background: rgba(0,0,0,0.25);
-      border-radius: 12px;
-    }
-
-    .result-label {
-      font-size: 11px;
-      opacity: 0.6;
-    }
-
-    .result-value {
-      font-size: 17px;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Busultan V10 PRO – Trading Platform</title>
+<style>
+body{margin:0;background:#080a1a;color:#fff;font-family:system-ui;}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:15px;background:linear-gradient(90deg,#4b8bff,#9a3dff);} 
+.navbar a{color:#fff;margin:0 10px;text-decoration:none;font-weight:600;cursor:pointer;}
+.page{display:none;padding:20px;}
+.page.active{display:block;}
+.container{max-width:1200px;margin:20px auto;padding:20px;}
+.card{background:rgba(255,255,255,0.06);padding:20px;border-radius:12px;margin-bottom:20px;backdrop-filter:blur(12px);} 
+</style>
 </head>
-<body class="theme-dark">
-  <div class="container">
-    <div class="nav">
-      <div class="nav-buttons">
-        <button class="nav-btn active">Position Sizing</button>
-        <button class="nav-btn">Dashboard</button>
-        <button class="nav-btn">Analytics</button>
-        <button class="nav-btn">Risk Engine</button>
-        <button class="nav-btn">Reports</button>
-        <button class="nav-btn">Settings</button>
-      </div>
-      <div class="logo">
-        <img src="https://alhammadi7.github.io/Lot/logo.png" alt="Busultan Logo">
-      </div>
-    </div>
+<body>
+<div class="navbar">
+  <div>
+    <a onclick="showPage('position')">Position</a>
+    <a onclick="showPage('dashboard')">Dashboard</a>
+    <a onclick="showPage('analytics')">Analytics</a>
+    <a onclick="showPage('charts')">Charts</a>
+    <a onclick="showPage('reports')">Reports</a>
+    <a onclick="showPage('risk')">Risk</a>
+    <a onclick="showPage('settings')">Settings</a>
+  </div>
+  <div style="font-weight:700;font-size:18px;">Busultan</div>
+</div>
 
-    <h2 class="title">حاسبة اللوت المتقدمة</h2>
-    <p class="subtitle">حدد رصيد الحساب، نسبة المخاطرة، وسيتولى النظام حساب حجم اللوت والأهداف تلقائيًا</p>
+<div class="container">
 
-    <form id="lotForm">
-      <div>
-        <label>رصيد الحساب (USD)</label>
-        <input type="number" id="balance" placeholder="مثال: 10000" value="10000">
-      </div>
-      <div>
-        <label>نسبة المخاطرة في الحساب %</label>
-        <input type="number" id="risk" step="0.1" placeholder="مثال: 1">
-      </div>
-      <div>
-        <label>سعر الدخول (Entry)</label>
-        <input type="number" id="entry" placeholder="مثال: 1.08500">
-      </div>
-      <div>
-        <label>سعر وقف الخسارة (SL)</label>
-        <input type="number" id="sl" placeholder="مثال: 1.08000">
-      </div>
-      <div>
-        <label>زوج / نوع الأداة</label>
-        <select id="pair">
-          <option>EURUSD</option>
-          <option>XAUUSD</option>
-          <option>USDJPY</option>
-          <option>GBPUSD</option>
-          <option>NAS100</option>
-        </select>
-      </div>
-      <div>
-        <label>اتجاه الصفقة</label>
-        <select id="type">
-          <option value="buy">شراء</option>
-          <option value="sell">بيع</option>
-        </select>
-      </div>
-      <div>
-        <label>هدف 1 (TP1)</label>
-        <input type="number" id="tp1" placeholder="نقطة الهدف الأول">
-      </div>
-      <div>
-        <label>هدف 2 (TP2)</label>
-        <input type="number" id="tp2" placeholder="نقطة الهدف الثاني">
-      </div>
-      <div>
-        <label>هدف 3 (TP3)</label>
-        <input type="number" id="tp3" placeholder="نقطة الهدف الثالث">
-      </div>
-      <div>
-        <label>الرافعة المالية</label>
-        <input type="number" id="leverage" placeholder="مثال: 500">
-      </div>
-      <div class="full" style="text-align:center;margin-top:10px;">
-        <button type="button" class="btn-primary" onclick="calculateLot()">احسب حجم اللوت</button>
-        <button type="reset" class="btn-ghost">مسح الحقول</button>
-      </div>
+  <section id="page-position" class="page active">
+  <div class="card"><h2>Position Sizing V10 PRO</h2></div>
+  <div class="card">
+    <form id="ps-form">
+      <label>رصيد الحساب</label>
+      <input type="number" id="ps-balance" placeholder="10000">
+
+      <label>نسبة المخاطرة %</label>
+      <input type="number" id="ps-risk" placeholder="1">
+
+      <label>سعر الدخول</label>
+      <input type="number" id="ps-entry" placeholder="1.08500">
+
+      <label>وقف الخسارة</label>
+      <input type="number" id="ps-sl" placeholder="1.08000">
+
+      <label>الرافعة المالية</label>
+      <input type="number" id="ps-leverage" placeholder="500">
+
+      <button type="button" onclick="psCalc()">احسب</button>
     </form>
 
-    <div class="results" id="results" style="display:none;">
-      <h3 style="margin-bottom:10px;">نتائج الحساب</h3>
-      <div class="result-grid">
-        <div class="result-box">
-          <div class="result-label">حجم اللوت</div>
-          <div class="result-value" id="lotSize">0.00</div>
-        </div>
-        <div class="result-box">
-          <div class="result-label">قيمة المخاطرة (USD)</div>
-          <div class="result-value" id="riskAmount">0</div>
-        </div>
-        <div class="result-box">
-          <div class="result-label">عدد النقاط إلى وقف الخسارة</div>
-          <div class="result-value" id="slPips">0</div>
-        </div>
-      </div>
-    </div>
+    <div id="ps-results" style="margin-top:20px;"></div>
   </div>
+</section>
+
+  <section id="page-dashboard" class="page">
+    <div class="card"><h2>Dashboard PRO</h2></div>
+  </section>
+
+  <section id="page-analytics" class="page">
+    <div class="card"><h2>Analytics Engine</h2></div>
+  </section>
+
+  <section id="page-charts" class="page">
+    <div class="card"><h2>Charts Suite</h2></div>
+  </section>
+
+  <section id="page-reports" class="page">
+    <div class="card"><h2>Reports Center</h2></div>
+  </section>
+
+  <section id="page-risk" class="page">
+    <div class="card"><h2>Risk Engine</h2></div>
+  </section>
+
+  <section id="page-settings" class="page">
+  <div class="card"><h2>Settings PRO</h2></div>
+
+  <div class="card">
+    <h3>إعدادات الحساب</h3>
+
+    <label>الرصيد الأساسي (Base Balance)</label>
+    <input type="number" id="set-base" placeholder="10000">
+
+    <label>إضافة إيداع</label>
+    <input type="number" id="set-deposit" placeholder="مثال: 500">
+    <button onclick="addDeposit()">إضافة</button>
+
+    <label>إضافة سحب</label>
+    <input type="number" id="set-withdraw" placeholder="مثال: 300">
+    <button onclick="addWithdraw()">سحب</button>
+  </div>
+
+  <div class="card">
+    <h3>اللغة</h3>
+    <select id="set-lang" onchange="switchLang()">
+      <option value="ar">العربية</option>
+      <option value="en">English</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <h3>السمة (Theme)</h3>
+    <select id="set-theme" onchange="switchTheme()">
+      <option value="dark">Dark</option>
+      <option value="light">Light</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <h3>إدارة النظام</h3>
+    <button onclick="fullReset()" style="background:#e11d48; color:#fff; padding:10px; border-radius:8px;">إعادة ضبط كاملة</button>
+  </div>
+</section>
+
+</div>
+
 <script>
-function calculateLot() {
-    const balance = parseFloat(document.getElementById("balance").value);
-    const riskPct = parseFloat(document.getElementById("risk").value);
-    const entry = parseFloat(document.getElementById("entry").value);
-    const sl = parseFloat(document.getElementById("sl").value);
-    const leverage = parseFloat(document.getElementById("leverage").value) || 500;
-    const pair = document.getElementById("pair").value;
-
-    if (!balance || !riskPct || !entry || !sl) {
-        alert("⚠️ يرجى إدخال جميع الحقول المطلوبة.");
-        return;
-    }
-
-    const riskAmount = balance * (riskPct / 100);
-    let pipValuePerLot = 10;
-    let pipSize = 0.0001;
-
-    if (pair.includes("JPY")) pipSize = 0.01;
-    if (pair === "XAUUSD") pipSize = 0.1;
-    if (pair === "NAS100") pipSize = 1;
-
-    const slDistance = Math.abs(entry - sl) / pipSize;
-    if (slDistance === 0) return alert("وقف الخسارة غير صحيح");
-
-    const lotSize = riskAmount / (slDistance * pipValuePerLot);
-
-    document.getElementById("lotSize").textContent = lotSize.toFixed(2);
-    document.getElementById("riskAmount").textContent = riskAmount.toFixed(2);
-    document.getElementById("slPips").textContent = slDistance.toFixed(1);
-
-    document.getElementById("results").style.display = "block";
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
 }
 </script>
 
